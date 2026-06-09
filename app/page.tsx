@@ -1,3 +1,3 @@
 git add .
-git commit -m "Philippine flag colors"
+git commit -m "Dark Filipino theme"
 git push
