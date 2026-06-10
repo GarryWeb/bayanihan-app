@@ -66,67 +66,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const initials = (s: string) => s?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'
 
   const SidebarContent = () => (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100%', background: C.card, borderRight: `1px solid ${C.border}`, fontFamily: "'Inter', sans-serif"}}>
-      {/* Brand */}
-      <div style={{padding: '16px', borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <div style={{width: '32px', height: '32px', background: C.gold, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: C.bg, fontSize: '14px', flexShrink: 0}}>C</div>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',background:C.card,borderRight:`1px solid ${C.border}`,fontFamily:"'Inter',sans-serif"}}>
+      <div style={{padding:'16px',borderBottom:`1px solid ${C.border}`,flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+          <div style={{width:'32px',height:'32px',background:C.gold,borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'700',color:C.bg,fontSize:'14px',flexShrink:0}}>C</div>
           <div>
-            <div style={{fontWeight: '700', fontSize: '13px', color: '#FFFFFF'}}>CommunityFlow</div>
-            <div style={{fontSize: '10px', color: C.muted}}>Simple. Transparent. Connected.</div>
+            <div style={{fontWeight:'700',fontSize:'13px',color:'#FFFFFF'}}>CommunityFlow</div>
+            <div style={{fontSize:'10px',color:C.muted}}>Simple. Transparent. Connected.</div>
           </div>
         </div>
       </div>
 
-      {/* Groups */}
-      <div style={{padding: '12px', borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
-        <div style={{fontSize: '10px', fontWeight: '600', color: C.muted, letterSpacing: '0.08em', marginBottom: '8px', paddingLeft: '4px'}}>GROUPS</div>
+      <div style={{padding:'12px',borderBottom:`1px solid ${C.border}`,flexShrink:0}}>
+        <div style={{fontSize:'10px',fontWeight:'600',color:C.muted,letterSpacing:'0.08em',marginBottom:'8px',paddingLeft:'4px'}}>GROUPS</div>
         {groups.map(g => {
           const pb = planBadge[g.plan] || planBadge.free
           const active = activeGroup?.id === g.id
           return (
-            <button key={g.id} onClick={() => setActiveGroup(g)}
-              style={{width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: '8px', marginBottom: '4px', cursor: 'pointer', background: active ? '#0B1F3A' : 'transparent', border: active ? `1px solid ${C.gold}44` : '1px solid transparent', color: active ? '#FFFFFF' : C.text, transition: 'all 0.15s'}}>
-              <div style={{fontSize: '12px', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{g.name}</div>
-              <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px'}}>
-                <span style={{fontSize: '10px', padding: '1px 6px', borderRadius: '10px', fontWeight: '600', background: pb.bg, color: pb.color}}>{g.plan}</span>
-                <span style={{fontSize: '10px', color: C.muted}}>{g.role}</span>
+            <button key={g.id} onClick={() => { setActiveGroup(g); setSidebarOpen(false) }}
+              style={{width:'100%',textAlign:'left',padding:'8px 10px',borderRadius:'8px',marginBottom:'4px',cursor:'pointer',background:active?'#0B1F3A':'transparent',border:active?`1px solid ${C.gold}44`:'1px solid transparent',color:active?'#FFFFFF':C.text,transition:'all 0.15s'}}>
+              <div style={{fontSize:'12px',fontWeight:'600',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{g.name}</div>
+              <div style={{display:'flex',alignItems:'center',gap:'6px',marginTop:'3px'}}>
+                <span style={{fontSize:'10px',padding:'1px 6px',borderRadius:'10px',fontWeight:'600',background:pb.bg,color:pb.color}}>{g.plan}</span>
+                <span style={{fontSize:'10px',color:C.muted}}>{g.role}</span>
               </div>
             </button>
           )
         })}
         <button onClick={() => setShowNewGroup(true)}
-          style={{width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: '8px', cursor: 'pointer', background: 'transparent', border: `1px dashed ${C.border}`, color: C.gold, fontSize: '12px', fontWeight: '600'}}>
+          style={{width:'100%',textAlign:'left',padding:'8px 10px',borderRadius:'8px',cursor:'pointer',background:'transparent',border:`1px dashed ${C.border}`,color:C.gold,fontSize:'12px',fontWeight:'600'}}>
           + New group
         </button>
       </div>
 
-      {/* Nav */}
-      <nav style={{flex: 1, padding: '12px', overflowY: 'auto'}}>
+      <nav style={{flex:1,padding:'12px',overflowY:'auto'}}>
         {NAV.map(item => {
           const active = pathname === item.href
           return (
             <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
-              style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', marginBottom: '2px', fontSize: '13px', fontWeight: active ? '600' : '400', textDecoration: 'none', background: active ? C.gold : 'transparent', color: active ? C.bg : C.text, borderLeft: active ? 'none' : 'none', transition: 'all 0.15s'}}>
-              <span style={{fontSize: '14px'}}>{item.icon}</span>
+              style={{display:'flex',alignItems:'center',gap:'10px',padding:'9px 12px',borderRadius:'8px',marginBottom:'2px',fontSize:'13px',fontWeight:active?'600':'400',textDecoration:'none',background:active?C.gold:'transparent',color:active?C.bg:C.text,transition:'all 0.15s'}}>
+              <span style={{fontSize:'14px'}}>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           )
         })}
       </nav>
 
-      {/* User */}
-      <div style={{padding: '12px', borderTop: `1px solid ${C.border}`, flexShrink: 0}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', background: '#0B1F3A'}}>
-          <div style={{width: '28px', height: '28px', borderRadius: '50%', background: C.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700', color: C.bg, flexShrink: 0}}>
+      <div style={{padding:'12px',borderTop:`1px solid ${C.border}`,flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px',borderRadius:'8px',background:'#0B1F3A'}}>
+          <div style={{width:'28px',height:'28px',borderRadius:'50%',background:C.gold,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:'700',color:C.bg,flexShrink:0}}>
             {initials(user?.user_metadata?.full_name || user?.email || '')}
           </div>
-          <div style={{flex: 1, minWidth: 0}}>
-            <div style={{fontSize: '12px', fontWeight: '600', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{user?.user_metadata?.full_name || 'User'}</div>
-            <div style={{fontSize: '10px', color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{user?.email}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:'12px',fontWeight:'600',color:'#FFFFFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.user_metadata?.full_name || 'User'}</div>
+            <div style={{fontSize:'10px',color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{user?.email}</div>
           </div>
           <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
-            style={{fontSize: '11px', color: C.muted, background: 'transparent', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: '4px'}}>
+            style={{fontSize:'11px',color:C.muted,background:'transparent',border:'none',cursor:'pointer',padding:'2px 6px',borderRadius:'4px',flexShrink:0}}>
             Exit
           </button>
         </div>
@@ -135,41 +131,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 
   return (
-    <div style={{display: 'flex', height: '100vh', overflow: 'hidden', background: C.bg, fontFamily: "'Inter', sans-serif"}}>
-      {/* Desktop sidebar */}
-      <div style={{width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column'}}>
+    <div style={{display:'flex',height:'100vh',overflow:'hidden',background:C.bg,fontFamily:"'Inter',sans-serif"}}>
+      {/* Desktop sidebar - hidden on mobile */}
+      <div style={{width:'220px',flexShrink:0,display:'flex',flexDirection:'column'}}
+        className="desktop-sidebar">
         <SidebarContent />
       </div>
 
-      {/* Mobile sidebar */}
+      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div style={{position: 'fixed', inset: 0, zIndex: 50, display: 'flex'}}>
-          <div style={{width: '240px', flexShrink: 0}}><SidebarContent /></div>
-          <div style={{flex: 1, background: 'rgba(0,0,0,0.6)'}} onClick={() => setSidebarOpen(false)} />
+        <div style={{position:'fixed',inset:0,zIndex:100,display:'flex'}}>
+          <div style={{width:'260px',flexShrink:0,height:'100%'}}>
+            <SidebarContent />
+          </div>
+          <div style={{flex:1,background:'rgba(0,0,0,0.7)'}} onClick={() => setSidebarOpen(false)} />
         </div>
       )}
 
-      {/* Main */}
-      <div style={{flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden'}}>
-        {/* Mobile topbar */}
-        <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: C.card, borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
-          <button onClick={() => setSidebarOpen(true)} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: C.gold, fontSize: '18px', lineHeight: 1}}>☰</button>
-          <span style={{fontWeight: '700', fontSize: '14px', color: '#FFFFFF'}}>CommunityFlow</span>
-          {activeGroup && <span style={{fontSize: '12px', color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{activeGroup.name}</span>}
+      {/* Main content */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
+        {/* Top bar - always visible */}
+        <div style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px 16px',background:C.card,borderBottom:`1px solid ${C.border}`,flexShrink:0}}>
+          <button onClick={() => setSidebarOpen(true)}
+            style={{background:'transparent',border:'none',cursor:'pointer',color:C.gold,fontSize:'20px',lineHeight:1,padding:'0',flexShrink:0}}>
+            ☰
+          </button>
+          <div style={{display:'flex',alignItems:'center',gap:'8px',flex:1,minWidth:0}}>
+            <div style={{width:'24px',height:'24px',background:C.gold,borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'700',color:C.bg,fontSize:'12px',flexShrink:0}}>C</div>
+            <span style={{fontWeight:'700',fontSize:'14px',color:'#FFFFFF',flexShrink:0}}>CommunityFlow</span>
+            {activeGroup && <span style={{fontSize:'12px',color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>· {activeGroup.name}</span>}
+          </div>
         </div>
 
-        <main style={{flex: 1, overflowY: 'auto', padding: '20px'}}>
+        <main style={{flex:1,overflowY:'auto',padding:'16px'}}>
           {activeGroup
             ? <ActiveGroupContext.Provider value={{ group: activeGroup, user, reload: () => loadGroups(user?.id) }}>
                 {children}
               </ActiveGroupContext.Provider>
             : (
-              <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center'}}>
-                <div style={{fontSize: '40px', marginBottom: '16px'}}>◎</div>
-                <h2 style={{fontSize: '18px', fontWeight: '700', color: '#FFFFFF', marginBottom: '8px'}}>No groups yet</h2>
-                <p style={{fontSize: '13px', color: C.muted, marginBottom: '24px'}}>Create your first group to get started</p>
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',textAlign:'center'}}>
+                <div style={{fontSize:'40px',marginBottom:'16px'}}>◎</div>
+                <h2 style={{fontSize:'18px',fontWeight:'700',color:'#FFFFFF',marginBottom:'8px'}}>No groups yet</h2>
+                <p style={{fontSize:'13px',color:C.muted,marginBottom:'24px'}}>Create your first group to get started</p>
                 <button onClick={() => setShowNewGroup(true)}
-                  style={{background: C.gold, color: C.bg, fontWeight: '700', fontSize: '14px', padding: '10px 24px', borderRadius: '8px', border: 'none', cursor: 'pointer'}}>
+                  style={{background:C.gold,color:C.bg,fontWeight:'700',fontSize:'14px',padding:'10px 24px',borderRadius:'8px',border:'none',cursor:'pointer'}}>
                   Create a group
                 </button>
               </div>
@@ -180,28 +185,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* New group modal */}
       {showNewGroup && (
-        <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'}}>
-          <div style={{background: C.card, borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '360px', border: `1px solid ${C.border}`}}>
-            <h2 style={{fontWeight: '700', fontSize: '18px', color: '#FFFFFF', marginBottom: '4px'}}>New group</h2>
-            <p style={{fontSize: '13px', color: C.muted, marginBottom: '16px'}}>Cooperative, paluwagan, or community organization</p>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:'24px'}}>
+          <div style={{background:C.card,borderRadius:'16px',padding:'24px',width:'100%',maxWidth:'360px',border:`1px solid ${C.border}`}}>
+            <h2 style={{fontWeight:'700',fontSize:'18px',color:'#FFFFFF',marginBottom:'4px'}}>New group</h2>
+            <p style={{fontSize:'13px',color:C.muted,marginBottom:'16px'}}>Cooperative, paluwagan, or community organization</p>
             <input type="text" value={newGroupName} onChange={e => setNewGroupName(e.target.value)}
               placeholder="e.g. Samahan ng Marikina"
-              onKeyDown={e => e.key === 'Enter' && handleCreateGroup()}
+              onKeyDown={e => e.key==='Enter'&&handleCreateGroup()}
               autoFocus
-              style={{width: '100%', background: C.bg, border: `1px solid ${C.border}`, borderRadius: '8px', padding: '11px 14px', fontSize: '14px', color: '#FFFFFF', outline: 'none', boxSizing: 'border-box', marginBottom: '16px'}} />
-            <div style={{display: 'flex', gap: '10px'}}>
+              style={{width:'100%',background:C.bg,border:`1px solid ${C.border}`,borderRadius:'8px',padding:'11px 14px',fontSize:'14px',color:'#FFFFFF',outline:'none',boxSizing:'border-box',marginBottom:'16px'}}/>
+            <div style={{display:'flex',gap:'10px'}}>
               <button onClick={() => setShowNewGroup(false)}
-                style={{flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '13px', cursor: 'pointer'}}>
+                style={{flex:1,padding:'10px',borderRadius:'8px',border:`1px solid ${C.border}`,background:'transparent',color:C.text,fontSize:'13px',cursor:'pointer'}}>
                 Cancel
               </button>
-              <button onClick={handleCreateGroup} disabled={creating || !newGroupName.trim()}
-                style={{flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: C.gold, color: C.bg, fontWeight: '700', fontSize: '13px', cursor: 'pointer', opacity: creating || !newGroupName.trim() ? 0.6 : 1}}>
-                {creating ? 'Creating...' : 'Create'}
+              <button onClick={handleCreateGroup} disabled={creating||!newGroupName.trim()}
+                style={{flex:1,padding:'10px',borderRadius:'8px',border:'none',background:C.gold,color:C.bg,fontWeight:'700',fontSize:'13px',cursor:'pointer',opacity:creating||!newGroupName.trim()?0.6:1}}>
+                {creating?'Creating...':'Create'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @media (min-width: 768px) {
+          .desktop-sidebar { display: flex !important; }
+        }
+        @media (max-width: 767px) {
+          .desktop-sidebar { display: none !important; }
+        }
+      `}</style>
     </div>
   )
 }
