@@ -5,7 +5,13 @@ import { useActiveGroup } from '../layout'
 
 const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', text: '#D6DCE5', muted: '#7A8FA6' }
 
-const PAYMENT_METHODS = ['Cash', 'GCash', 'Bank Transfer', 'Maya', 'Other']
+const PAYMENT_METHODS = [
+  { key: 'Cash', label: '💵 Cash', bg: '#1A3A5C', color: '#93C5FD' },
+  { key: 'GCash', label: '💜 GCash', bg: '#1A2550', color: '#818CF8' },
+  { key: 'Bank Transfer', label: '🏦 Bank Transfer', bg: '#1A3A2A', color: '#6EE7B7' },
+  { key: 'Maya', label: '💙 Maya', bg: '#2A1A3A', color: '#C4B5FD' },
+  { key: 'Other', label: '📝 Other', bg: '#2A2A1A', color: '#FCD34D' },
+]
 
 export default function ContributionsPage() {
   const { group, user } = useActiveGroup()
@@ -53,16 +59,18 @@ export default function ContributionsPage() {
   }
   const statusLabel: Record<string, string> = { paid: '✓ Paid', pending: '⏳ Pending', overdue: '⚠ Overdue' }
 
-  const methodColors: Record<string, { bg: string, color: string }> = {
-    'Cash': { bg: '#1A3A5C', color: '#93C5FD' },
-    'GCash': { bg: '#1A2550', color: '#818CF8' },
-    'Bank Transfer': { bg: '#1A3A2A', color: '#6EE7B7' },
-    'Maya': { bg: '#2A1A3A', color: '#C4B5FD' },
-    'Other': { bg: '#2A2A1A', color: '#FCD34D' },
-  }
-
   const paid = contributions.filter(c => c.status === 'paid')
   const totalCollected = paid.reduce((s, c) => s + Number(c.amount_paid), 0)
+
+  // Payment method breakdown
+  const methodBreakdown = PAYMENT_METHODS.map(m => {
+    const filtered = paid.filter(c => (c.notes?.split(' · ')[0] || 'Cash') === m.key)
+    return {
+      ...m,
+      count: filtered.length,
+      total: filtered.reduce((s, c) => s + Number(c.amount_paid), 0)
+    }
+  }).filter(m => m.count > 0)
 
   const inputStyle = { background: '#0B1F3A', border: `1px solid ${C.border}`, borderRadius: '8px', padding: '9px 12px', fontSize: '13px', color: '#FFFFFF', outline: 'none' }
 
@@ -89,6 +97,27 @@ export default function ContributionsPage() {
         <span style={{fontSize:'13px',fontWeight:'700',color:C.gold}}>₱{totalCollected.toLocaleString()} collected</span>
       </div>
 
+      {/* Payment method breakdown */}
+      {methodBreakdown.length > 0 && (
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'16px'}}>
+          <h3 style={{fontSize:'13px',fontWeight:'600',color:C.gold,margin:'0 0 12px'}}>Payment Breakdown</h3>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:'10px'}}>
+            {methodBreakdown.map(m => (
+              <div key={m.key} style={{background:'#0B1F3A',borderRadius:'10px',padding:'12px',border:`1px solid ${m.bg}`}}>
+                <div style={{fontSize:'12px',color:m.color,fontWeight:'600',marginBottom:'4px'}}>{m.label}</div>
+                <div style={{fontSize:'18px',fontWeight:'700',color:'#FFFFFF'}}>₱{m.total.toLocaleString()}</div>
+                <div style={{fontSize:'11px',color:C.muted,marginTop:'2px'}}>{m.count} payment{m.count>1?'s':''}</div>
+              </div>
+            ))}
+            <div style={{background:'#0B1F3A',borderRadius:'10px',padding:'12px',border:`1px solid ${C.gold}44`}}>
+              <div style={{fontSize:'12px',color:C.gold,fontWeight:'600',marginBottom:'4px'}}>📊 Total</div>
+              <div style={{fontSize:'18px',fontWeight:'700',color:C.gold}}>₱{totalCollected.toLocaleString()}</div>
+              <div style={{fontSize:'11px',color:C.muted,marginTop:'2px'}}>{paid.length} payment{paid.length>1?'s':''}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Record form */}
       {showRecord && (
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'16px'}}>
@@ -100,13 +129,13 @@ export default function ContributionsPage() {
             <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'8px'}}>Payment Method</label>
             <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
               {PAYMENT_METHODS.map(m => (
-                <button key={m} onClick={() => setForm(f => ({...f, payment_method: m}))}
-                  style={{padding:'7px 14px',borderRadius:'20px',fontSize:'12px',fontWeight:'600',cursor:'pointer',border:'none',
-                    background: form.payment_method === m ? C.gold : '#0B1F3A',
-                    color: form.payment_method === m ? C.bg : C.muted,
-                    border: `1px solid ${form.payment_method === m ? C.gold : C.border}`,
+                <button key={m.key} onClick={() => setForm(f => ({...f, payment_method: m.key}))}
+                  style={{padding:'7px 14px',borderRadius:'20px',fontSize:'12px',fontWeight:'600',cursor:'pointer',
+                    background: form.payment_method === m.key ? C.gold : '#0B1F3A',
+                    color: form.payment_method === m.key ? C.bg : C.muted,
+                    border: `1px solid ${form.payment_method === m.key ? C.gold : C.border}`,
                     transition:'all 0.15s'}}>
-                  {m === 'GCash' ? '💜 GCash' : m === 'Cash' ? '💵 Cash' : m === 'Bank Transfer' ? '🏦 Bank Transfer' : m === 'Maya' ? '💙 Maya' : '📝 Other'}
+                  {m.label}
                 </button>
               ))}
             </div>
@@ -141,9 +170,9 @@ export default function ContributionsPage() {
               </select>
             </div>
             <div>
-              <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'4px'}}>Notes (optional)</label>
+              <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'4px'}}>Reference # (optional)</label>
               <input type="text" value={form.notes} onChange={e => setForm(f => ({...f,notes:e.target.value}))}
-                placeholder="Reference number, etc." style={{...inputStyle,width:'100%',boxSizing:'border-box' as const}}/>
+                placeholder="GCash ref: 0612-1234-5678" style={{...inputStyle,width:'100%',boxSizing:'border-box' as const}}/>
             </div>
           </div>
           <button onClick={handleRecord} disabled={saving||!form.member_id}
@@ -153,10 +182,11 @@ export default function ContributionsPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Payment history table */}
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',overflow:'hidden'}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto auto auto auto',gap:'8px',padding:'10px 16px',background:'#0B1F3A',borderBottom:`1px solid ${C.border}`,fontSize:'11px',fontWeight:'600',color:C.muted,textTransform:'uppercase' as const}}>
-          <span>Member</span><span>Method</span><span>Amount</span><span>Date</span><span>Status</span>
+        <div style={{padding:'12px 16px',borderBottom:`1px solid ${C.border}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <span style={{fontSize:'13px',fontWeight:'600',color:C.gold}}>Payment History</span>
+          <span style={{fontSize:'12px',color:C.muted}}>{new Date(cycle+'-01').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</span>
         </div>
         {contributions.length === 0 ? (
           <div style={{textAlign:'center',padding:'40px',color:C.muted}}>
@@ -165,17 +195,32 @@ export default function ContributionsPage() {
         ) : contributions.map((c, i) => {
           const sc = statusColors[c.status] || statusColors.pending
           const method = c.notes?.split(' · ')[0] || 'Cash'
-          const mc = methodColors[method] || methodColors['Other']
+          const refNum = c.notes?.split(' · ')[1] || ''
+          const mc = PAYMENT_METHODS.find(m => m.key === method) || PAYMENT_METHODS[0]
           return (
-            <div key={c.id} style={{display:'grid',gridTemplateColumns:'1fr auto auto auto auto',gap:'8px',padding:'10px 16px',borderBottom:i<contributions.length-1?`1px solid ${C.border}`:'none',alignItems:'center'}}>
-              <div>
-                <div style={{fontSize:'13px',fontWeight:'600',color:'#FFFFFF'}}>{c.profile?.full_name}</div>
-                {c.late_fee > 0 && <div style={{fontSize:'11px',color:'#F87171'}}>+₱{c.late_fee} late fee</div>}
+            <div key={c.id} style={{padding:'12px 16px',borderBottom:i<contributions.length-1?`1px solid ${C.border}`:'none'}}>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'4px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                  <div style={{width:'32px',height:'32px',borderRadius:'50%',background:C.gold,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'11px',fontWeight:'700',color:C.bg,flexShrink:0}}>
+                    {c.profile?.full_name?.split(' ').map((n:string)=>n[0]).join('').toUpperCase().slice(0,2)||'?'}
+                  </div>
+                  <div>
+                    <div style={{fontSize:'13px',fontWeight:'600',color:'#FFFFFF'}}>{c.profile?.full_name}</div>
+                    <div style={{fontSize:'11px',color:C.muted}}>
+                      {c.paid_at ? new Date(c.paid_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}
+                    </div>
+                  </div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontSize:'14px',fontWeight:'700',color:'#FFFFFF'}}>₱{Number(c.amount_paid).toLocaleString()}</div>
+                  {c.late_fee > 0 && <div style={{fontSize:'11px',color:'#F87171'}}>+₱{c.late_fee} late fee</div>}
+                </div>
               </div>
-              <div><span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:mc.bg,color:mc.color}}>{method}</span></div>
-              <div style={{fontSize:'13px',color:'#FFFFFF'}}>₱{Number(c.amount_paid).toLocaleString()}</div>
-              <div style={{fontSize:'12px',color:C.muted}}>{c.paid_at?new Date(c.paid_at).toLocaleDateString('en-US'):'—'}</div>
-              <div><span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:sc.bg,color:sc.color}}>{statusLabel[c.status]}</span></div>
+              <div style={{display:'flex',alignItems:'center',gap:'8px',marginTop:'6px'}}>
+                <span style={{fontSize:'11px',padding:'2px 8px',borderRadius:'20px',fontWeight:'600',background:mc.bg,color:mc.color}}>{mc.label}</span>
+                {refNum && <span style={{fontSize:'11px',color:C.muted}}>Ref: {refNum}</span>}
+                <span style={{fontSize:'11px',padding:'2px 8px',borderRadius:'20px',fontWeight:'600',background:sc.bg,color:sc.color,marginLeft:'auto'}}>{statusLabel[c.status]}</span>
+              </div>
             </div>
           )
         })}
