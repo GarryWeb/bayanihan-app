@@ -1,120 +1,116 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { getDashboardStats, getAnnouncements } from '@/lib/supabase'
-import { useActiveGroup } from './layout'
+import Link from 'next/link'
 
-function fmt(n: number) {
-  return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-}
-
-export default function DashboardPage() {
-  const { group } = useActiveGroup()
-  const [stats, setStats] = useState<any>(null)
-  const [announcements, setAnnouncements] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!group) return
-    setLoading(true)
-    Promise.all([
-      getDashboardStats(group.id),
-      getAnnouncements(group.id)
-    ]).then(([s, a]) => {
-      setStats(s)
-      setAnnouncements(a)
-      setLoading(false)
-    })
-  }, [group])
-
-  if (!group) return null
-  if (loading) return (
-    <div className="flex items-center justify-center h-48">
-      <div className="animate-spin w-6 h-6 border-2 border-[#1D9E75] border-t-transparent rounded-full" />
-    </div>
-  )
-
-  const cycle = stats?.current_cycle
-  const cycleLabel = cycle ? new Date(cycle + '-01').toLocaleDateString('tl-PH', { month: 'long', year: 'numeric' }) : ''
-
-  const statCards = [
-    { label: 'Total Members', value: stats?.total_members, icon: '👥', color: 'bg-white' },
-    { label: 'Community Fund', value: fmt(stats?.total_fund || 0), icon: '💰', color: 'bg-white' },
-    { label: 'Collected ngayong buwan', value: fmt(stats?.collected_this_cycle || 0), icon: '✅', color: 'bg-white' },
-    { label: 'Pending', value: fmt(stats?.pending_this_cycle || 0), icon: '⏳', color: 'bg-white' },
-    { label: 'Overdue ngayong buwan', value: stats?.overdue_count, icon: '⚠️', color: stats?.overdue_count > 0 ? 'bg-red-50 border-red-100' : 'bg-white' },
-    { label: 'Active Loans', value: fmt(stats?.total_loans_out || 0), icon: '🏦', color: 'bg-white' },
-  ]
-
+export default function LandingPage() {
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">{group.name}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{cycleLabel} · Overview</p>
+    <div className="min-h-screen flex flex-col" style={{background: '#0A0F2E'}}>
+      {/* Flag bar top */}
+      <div className="h-1 w-full flex">
+        <div className="flex-1" style={{background: '#0038A8'}}></div>
+        <div className="flex-1" style={{background: '#FCD116'}}></div>
+        <div className="flex-1" style={{background: '#CE1126'}}></div>
       </div>
 
-      {/* Overdue alert */}
-      {stats?.overdue_count > 0 && (
-        <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-5 flex gap-3 items-start">
-          <span className="text-lg">⚠️</span>
+      {/* Nav */}
+      <nav className="px-5 py-3 flex items-center justify-between" style={{background: '#0D1535', borderBottom: '1px solid #1E2D5A'}}>
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-base"
+            style={{background: 'linear-gradient(135deg, #CE1126, #0038A8)'}}>
+            B
+          </div>
           <div>
-            <div className="text-sm font-medium text-red-700">{stats.overdue_count} miyembro ang overdue ngayong cycle</div>
-            <div className="text-xs text-red-500 mt-0.5">Pumunta sa Contributions para makita kung sino</div>
+            <div className="font-bold text-sm" style={{color: '#FCD116'}}>Bayanihan</div>
+            <div className="text-xs" style={{color: '#A0AEC0'}}>Para sa mga Pilipino 🇵🇭</div>
           </div>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <Link href="/auth/login" className="text-sm font-medium px-3 py-1.5 rounded-lg border"
+            style={{color: '#FCD116', borderColor: '#FCD116'}}>
+            Login
+          </Link>
+          <Link href="/auth/signup" className="text-sm font-medium px-3 py-1.5 rounded-lg text-white font-bold"
+            style={{background: '#CE1126'}}>
+            Libre →
+          </Link>
+        </div>
+      </nav>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-        {statCards.map(s => (
-          <div key={s.label} className={`${s.color} border border-gray-100 rounded-xl p-4`}>
-            <div className="text-xl mb-1">{s.icon}</div>
-            <div className="text-xl font-semibold text-gray-900">{s.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
-          </div>
-        ))}
-      </div>
+      {/* Hero */}
+      <main className="flex-1 flex flex-col items-center justify-center px-5 py-12 text-center">
 
-      {/* Progress bar */}
-      <div className="bg-white border border-gray-100 rounded-xl p-4 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">Collection progress ngayong buwan</span>
-          <span className="text-sm font-medium text-[#1D9E75]">
-            {stats?.total_members > 0
-              ? Math.round(((stats.total_members - (stats.overdue_count + Math.round(stats.pending_this_cycle / (group.contribution_amount || 500)))) / stats.total_members) * 100)
-              : 0}%
-          </span>
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6"
+          style={{background: '#1A2550', color: '#FCD116', border: '1px solid #FCD116'}}>
+          🇵🇭 Para sa mga Pilipino
         </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-[#1D9E75] rounded-full transition-all"
-            style={{ width: `${stats?.total_members > 0 ? Math.min(100, Math.round((stats.collected_this_cycle / (stats.total_members * (group.contribution_amount || 500))) * 100)) : 0}%` }} />
-        </div>
-        <div className="flex justify-between text-xs text-gray-400 mt-1.5">
-          <span>{fmt(stats?.collected_this_cycle || 0)} nakolekta</span>
-          <span>{fmt(stats?.total_members * (group.contribution_amount || 500))} target</span>
-        </div>
-      </div>
 
-      {/* Announcements */}
-      <div className="bg-white border border-gray-100 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900">Mga Anunsyo</h2>
+        <h1 className="text-3xl md:text-5xl font-bold max-w-xl leading-tight mb-4" style={{color: '#FFFFFF'}}>
+          Mula sa notebook,<br />
+          <span style={{color: '#CE1126'}}>dalhin natin</span>{' '}
+          <span style={{color: '#FCD116'}}>ang bayanihan</span><br />
+          <span style={{color: '#5B8BFF'}}>sa digital age.</span>
+        </h1>
+
+        <p className="text-sm md:text-base max-w-md mb-8 leading-relaxed" style={{color: '#A0AEC0'}}>
+          I-track ang contributions, funds, at bills ng inyong paluwagan o kooperatiba.
+          Transparent. Simple. <span style={{color: '#FCD116', fontWeight: 'bold'}}>Libre magsimula.</span>
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-none justify-center">
+          <Link href="/auth/signup"
+            className="px-8 py-3 rounded-xl text-white font-bold text-sm"
+            style={{background: 'linear-gradient(135deg, #CE1126, #8B0000)'}}>
+            Magsimula nang libre 🇵🇭
+          </Link>
+          <Link href="/auth/login"
+            className="px-8 py-3 rounded-xl font-bold text-sm border-2"
+            style={{color: '#FCD116', borderColor: '#FCD116', background: 'transparent'}}>
+            Mag-login
+          </Link>
         </div>
-        {announcements.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-4">Walang anunsyo pa</p>
-        ) : (
-          <div className="space-y-3">
-            {announcements.slice(0, 3).map(a => (
-              <div key={a.id} className={`p-3 rounded-lg border-l-4 ${a.is_pinned ? 'bg-yellow-50 border-yellow-400' : 'bg-blue-50 border-blue-300'}`}>
-                <div className="text-sm font-medium text-gray-900">{a.title}</div>
-                <div className="text-xs text-gray-600 mt-0.5 line-clamp-2">{a.body}</div>
-                <div className="text-xs text-gray-400 mt-1">
-                  {a.profile?.full_name} · {new Date(a.posted_at).toLocaleDateString('tl-PH')}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+
+        {/* Pricing pills */}
+        <div className="flex flex-wrap gap-2 justify-center mt-10">
+          {[
+            { name: 'Free', desc: '10 members · ₱0', bg: '#1A2550', color: '#5B8BFF' },
+            { name: 'Starter', desc: '30 members · ₱200/mo', bg: '#2D1A1A', color: '#FF6B6B' },
+            { name: 'Pro', desc: '80 members · ₱1,299/mo', bg: '#0038A8', color: '#FCD116' },
+            { name: 'Elite', desc: 'Unlimited · ₱2,999/mo', bg: '#CE1126', color: '#FCD116' },
+          ].map(p => (
+            <div key={p.name} className="px-3 py-1.5 rounded-full text-xs font-bold"
+              style={{background: p.bg, color: p.color, border: `1px solid ${p.color}33`}}>
+              {p.name} — {p.desc}
+            </div>
+          ))}
+        </div>
+
+        {/* Feature grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-10 max-w-lg w-full text-left">
+          {[
+            { icon: '👥', title: 'Member tracker', desc: 'Lahat ng miyembro at kanilang records', bg: '#1A2550', color: '#5B8BFF' },
+            { icon: '💰', title: 'Fund overview', desc: 'Total fund, collected, at pending', bg: '#2D1A1A', color: '#FF6B6B' },
+            { icon: '📋', title: 'Bills tracker', desc: 'Lahat ng scheduled payments', bg: '#2D2500', color: '#FCD116' },
+            { icon: '🏦', title: 'Loan management', desc: 'Request, approve, at i-track', bg: '#1A2550', color: '#5B8BFF' },
+            { icon: '📱', title: 'SMS reminders', desc: 'Auto-remind sa overdue members', bg: '#2D1A1A', color: '#FF6B6B' },
+            { icon: '📊', title: 'PDF reports', desc: 'Monthly report para sa treasurer', bg: '#2D2500', color: '#FCD116' },
+          ].map(f => (
+            <div key={f.title} className="rounded-xl p-3" style={{background: f.bg, border: `1px solid ${f.color}33`}}>
+              <div className="text-xl mb-1">{f.icon}</div>
+              <div className="font-bold text-xs mb-0.5" style={{color: f.color}}>{f.title}</div>
+              <div className="text-xs" style={{color: '#718096'}}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Footer flag bar */}
+      <div className="h-1 w-full flex">
+        <div className="flex-1" style={{background: '#CE1126'}}></div>
+        <div className="flex-1" style={{background: '#FCD116'}}></div>
+        <div className="flex-1" style={{background: '#0038A8'}}></div>
       </div>
+      <footer className="text-center py-4 text-xs" style={{background: '#0D1535', color: '#4A5568'}}>
+        © 2025 Bayanihan · Community Savings Platform para sa mga Pilipino 🇵🇭
+      </footer>
     </div>
   )
 }
