@@ -1,113 +1,133 @@
-import Link from 'next/link'
+'use client'
+import { useEffect, useState } from 'react'
+import { getGroupMembers, addMemberByEmail } from '@/lib/supabase'
+import { useActiveGroup } from '../layout'
 
-export default function LandingPage() {
+const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', text: '#D6DCE5', muted: '#7A8FA6' }
+
+export default function MembersPage() {
+  const { group, user } = useActiveGroup()
+  const [members, setMembers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showAdd, setShowAdd] = useState(false)
+  const [email, setEmail] = useState('')
+  const [role, setRole] = useState('member')
+  const [adding, setAdding] = useState(false)
+  const [msg, setMsg] = useState({ type: '', text: '' })
+
+  const planLimit: Record<string, number> = { free: 10, starter: 30, pro: 80, elite: Infinity }
+  const limit = planLimit[group?.plan] || 10
+  const isAdmin = members.find(m => m.profile_id === user?.id)?.role === 'admin'
+
+  useEffect(() => { if (!group) return; loadMembers() }, [group])
+
+  async function loadMembers() {
+    setLoading(true)
+    const data = await getGroupMembers(group.id)
+    setMembers(data)
+    setLoading(false)
+  }
+
+  async function handleAdd() {
+    if (!email.trim()) return
+    if (members.length >= limit) { setMsg({ type: 'error', text: `Plan limit reached (${limit} members). Upgrade to add more.` }); return }
+    setAdding(true)
+    setMsg({ type: '', text: '' })
+    try {
+      await addMemberByEmail(group.id, email.trim(), role)
+      setMsg({ type: 'success', text: 'Member added successfully!' })
+      setEmail('')
+      loadMembers()
+    } catch (e: any) { setMsg({ type: 'error', text: e.message }) }
+    setAdding(false)
+  }
+
+  const roleColor: Record<string, { bg: string, color: string }> = {
+    admin: { bg: C.gold, color: C.bg },
+    treasurer: { bg: '#1A3A5C', color: C.gold },
+    member: { bg: '#0B1F3A', color: C.text },
+  }
+
+  const initials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || '?'
+
+  if (loading) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'200px'}}><div style={{width:'32px',height:'32px',border:`3px solid ${C.gold}`,borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>
+
   return (
-    <div style={{background: '#0B1F3A', minHeight: '100vh', fontFamily: "'Inter', 'Poppins', sans-serif", color: '#FFFFFF'}}>
+    <div style={{fontFamily:"'Inter',sans-serif",color:'#FFFFFF'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'20px'}}>
+        <div>
+          <h1 style={{fontSize:'20px',fontWeight:'700',color:'#FFFFFF',margin:0}}>Members</h1>
+          <p style={{fontSize:'13px',color:C.muted,margin:'4px 0 0'}}>{members.length} / {limit === Infinity ? '∞' : limit} · {group?.plan} plan</p>
+        </div>
+        {isAdmin && (
+          <button onClick={() => setShowAdd(!showAdd)}
+            style={{background:C.gold,color:C.bg,fontWeight:'700',fontSize:'13px',padding:'8px 16px',borderRadius:'8px',border:'none',cursor:'pointer'}}>
+            + Add Member
+          </button>
+        )}
+      </div>
 
-      {/* Nav */}
-      <nav style={{background: '#0B1F3A', borderBottom: '1px solid #1A3A5C', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <div style={{width: '36px', height: '36px', background: '#D4A017', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#0B1F3A', fontSize: '16px'}}>C</div>
-          <div>
-            <div style={{fontWeight: '700', fontSize: '15px', color: '#FFFFFF', letterSpacing: '-0.3px'}}>CommunityFlow</div>
-            <div style={{fontSize: '10px', color: '#D6DCE5'}}>Simple. Transparent. Connected.</div>
+      {/* Plan limit bar */}
+      {limit !== Infinity && (
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'10px',padding:'12px 16px',marginBottom:'14px'}}>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:'12px',color:C.muted,marginBottom:'6px'}}>
+            <span>Members</span><span>{members.length}/{limit}</span>
           </div>
+          <div style={{height:'5px',background:'#0B1F3A',borderRadius:'3px',overflow:'hidden'}}>
+            <div style={{height:'100%',width:`${Math.min(100,(members.length/limit)*100)}%`,background:members.length>=limit?'#FF6B6B':C.gold,borderRadius:'3px'}}/>
+          </div>
+          {members.length >= limit && <p style={{fontSize:'12px',color:'#FF6B6B',margin:'6px 0 0'}}>Plan limit reached. <a href="/dashboard/settings" style={{color:C.gold}}>Upgrade →</a></p>}
         </div>
-        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-          <Link href="/auth/login" style={{fontSize: '13px', color: '#D6DCE5', padding: '7px 16px', borderRadius: '7px', border: '1px solid #2A4A6C', textDecoration: 'none'}}>Login</Link>
-          <Link href="/auth/signup" style={{fontSize: '13px', fontWeight: '600', color: '#0B1F3A', padding: '7px 16px', borderRadius: '7px', background: '#D4A017', textDecoration: 'none'}}>Start Free</Link>
-        </div>
-      </nav>
+      )}
 
-      {/* Hero */}
-      <section style={{textAlign: 'center', padding: '72px 24px 56px'}}>
-        <div style={{display: 'inline-block', background: '#132D4E', color: '#D4A017', fontSize: '11px', fontWeight: '600', padding: '5px 14px', borderRadius: '20px', marginBottom: '24px', letterSpacing: '0.08em', textTransform: 'uppercase'}}>
-          Community Management Platform
+      {/* Add member form */}
+      {showAdd && isAdmin && (
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'14px'}}>
+          <h3 style={{fontSize:'14px',fontWeight:'600',color:'#FFFFFF',margin:'0 0 12px'}}>Add a member</h3>
+          {msg.text && <div style={{fontSize:'13px',padding:'8px 12px',borderRadius:'8px',marginBottom:'12px',background:msg.type==='error'?'#FF000015':'#D4A01715',color:msg.type==='error'?'#FF6B6B':C.gold}}>{msg.text}</div>}
+          <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="member@email.com"
+              onKeyDown={e => e.key==='Enter'&&handleAdd()}
+              style={{flex:1,minWidth:'200px',background:'#0B1F3A',border:`1px solid ${C.border}`,borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#FFFFFF',outline:'none'}}/>
+            <select value={role} onChange={e => setRole(e.target.value)}
+              style={{background:'#0B1F3A',border:`1px solid ${C.border}`,borderRadius:'8px',padding:'9px 12px',fontSize:'13px',color:'#FFFFFF',outline:'none'}}>
+              <option value="member">Member</option>
+              <option value="treasurer">Treasurer</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button onClick={handleAdd} disabled={adding||!email.trim()}
+              style={{background:C.gold,color:C.bg,fontWeight:'700',fontSize:'13px',padding:'9px 16px',borderRadius:'8px',border:'none',cursor:'pointer',opacity:adding||!email.trim()?0.6:1}}>
+              {adding?'Adding...':'Add'}
+            </button>
+          </div>
+          <p style={{fontSize:'12px',color:C.muted,margin:'8px 0 0'}}>The member must have a CommunityFlow account first.</p>
         </div>
-        <h1 style={{fontSize: 'clamp(28px, 6vw, 52px)', fontWeight: '700', lineHeight: '1.15', marginBottom: '20px', maxWidth: '640px', margin: '0 auto 20px', letterSpacing: '-1px'}}>
-          Manage your community,<br />
-          <span style={{color: '#D4A017'}}>Funds, and Records</span><br />
-          in one place.
-        </h1>
-        <p style={{fontSize: '15px', color: '#D6DCE5', maxWidth: '480px', margin: '0 auto 36px', lineHeight: '1.7'}}>
-          A modern platform for member management, contributions, payments, and financial tracking. Simple. Transparent. Connected.
-        </p>
-        <div style={{display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap'}}>
-          <Link href="/auth/signup" style={{background: '#D4A017', color: '#0B1F3A', fontWeight: '700', fontSize: '14px', padding: '13px 28px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block'}}>
-            Start Free
-          </Link>
-          <Link href="/auth/login" style={{background: 'transparent', color: '#FFFFFF', fontWeight: '500', fontSize: '14px', padding: '13px 28px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', border: '1px solid #2A4A6C'}}>
-            Login
-          </Link>
-        </div>
-      </section>
+      )}
 
-      {/* Features */}
-      <section style={{padding: '48px 24px', maxWidth: '960px', margin: '0 auto'}}>
-        <h2 style={{textAlign: 'center', fontSize: '22px', fontWeight: '700', marginBottom: '8px'}}>Everything your community needs</h2>
-        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Built for cooperatives, paluwagan groups, and community organizations.</p>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px'}}>
-          {[
-            { title: 'Member Management', desc: 'Track all members, roles, and membership history in one organized dashboard.' },
-            { title: 'Fund Overview', desc: 'Real-time visibility into total funds, collections, and pending payments.' },
-            { title: 'Payment Tracking', desc: 'Record and monitor every contribution with full transaction history.' },
-            { title: 'Loan Management', desc: 'Handle loan requests, approvals, and repayment schedules with ease.' },
-            { title: 'Reports & Analytics', desc: 'Generate monthly PDF reports for transparency and compliance.' },
-            { title: 'Overdue Alerts', desc: 'Automatic notifications for overdue members and pending collections.' },
-          ].map(f => (
-            <div key={f.title} style={{background: '#FFFFFF', borderRadius: '12px', padding: '20px', color: '#0B1F3A'}}>
-              <div style={{width: '32px', height: '3px', background: '#D4A017', borderRadius: '2px', marginBottom: '12px'}}></div>
-              <div style={{fontWeight: '600', fontSize: '14px', marginBottom: '6px'}}>{f.title}</div>
-              <div style={{fontSize: '13px', color: '#4A5568', lineHeight: '1.6'}}>{f.desc}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Plans */}
-      <section style={{padding: '48px 24px', maxWidth: '960px', margin: '0 auto'}}>
-        <h2 style={{textAlign: 'center', fontSize: '22px', fontWeight: '700', marginBottom: '8px'}}>Simple pricing</h2>
-        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Start free. Upgrade as your group grows.</p>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px'}}>
-          {[
-            { name: 'Free', price: '₱0', period: 'forever', members: 'Up to 10 Members', features: ['Member tracker', 'Fund overview', 'Payment history'], highlight: false },
-            { name: 'Starter', price: '₱200', period: '/month', members: 'Up to 30 Members', features: ['Everything in Free', 'Bills tracker', 'Overdue alerts', 'Group announcements'], highlight: false },
-            { name: 'Pro', price: '₱1,299', period: '/month', members: 'Up to 80 Members', features: ['Everything in Starter', 'Loan management', 'Loan calculator', 'SMS reminders', 'PDF reports'], highlight: true },
-            { name: 'Elite', price: '₱2,999', period: '/month', members: 'Unlimited Members', features: ['Everything in Pro', 'AI features', 'White-label', 'Multi-group', 'GCash QR', 'Priority support'], highlight: false },
-          ].map(p => (
-            <div key={p.name} style={{
-              background: p.highlight ? '#D4A017' : '#FFFFFF',
-              borderRadius: '12px', padding: '24px',
-              color: p.highlight ? '#0B1F3A' : '#0B1F3A',
-              border: p.highlight ? 'none' : '1px solid #E2E8F0',
-              position: 'relative'
-            }}>
-              {p.highlight && <div style={{position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: '#0B1F3A', color: '#D4A017', fontSize: '10px', fontWeight: '700', padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap'}}>MOST POPULAR</div>}
-              <div style={{fontWeight: '700', fontSize: '16px', marginBottom: '4px'}}>{p.name}</div>
-              <div style={{fontSize: '24px', fontWeight: '700', marginBottom: '2px'}}>{p.price}<span style={{fontSize: '12px', fontWeight: '400'}}>{p.period}</span></div>
-              <div style={{fontSize: '12px', marginBottom: '16px', opacity: 0.7}}>{p.members}</div>
-              <div style={{borderTop: `1px solid ${p.highlight ? '#0B1F3A22' : '#E2E8F0'}`, paddingTop: '14px'}}>
-                {p.features.map(f => (
-                  <div key={f} style={{fontSize: '12px', padding: '3px 0', display: 'flex', alignItems: 'center', gap: '6px'}}>
-                    <span style={{color: p.highlight ? '#0B1F3A' : '#D4A017', fontWeight: '700'}}>✓</span> {f}
-                  </div>
-                ))}
+      {/* Members list */}
+      <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',overflow:'hidden'}}>
+        {members.length === 0 ? (
+          <div style={{textAlign:'center',padding:'40px',color:C.muted}}>
+            <div style={{fontSize:'32px',marginBottom:'8px'}}>◎</div>
+            <p style={{fontSize:'13px',margin:0}}>No members yet. Add your first member!</p>
+          </div>
+        ) : members.map((m, i) => {
+          const rc = roleColor[m.role] || roleColor.member
+          return (
+            <div key={m.id} style={{display:'flex',alignItems:'center',gap:'12px',padding:'12px 16px',borderBottom:i<members.length-1?`1px solid ${C.border}`:'none'}}>
+              <div style={{width:'36px',height:'36px',borderRadius:'50%',background:C.gold,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'700',color:C.bg,flexShrink:0}}>
+                {initials(m.profile?.full_name||'')}
               </div>
-              <Link href="/auth/signup" style={{
-                display: 'block', textAlign: 'center', marginTop: '16px',
-                background: p.highlight ? '#0B1F3A' : '#D4A017',
-                color: p.highlight ? '#D4A017' : '#0B1F3A',
-                fontWeight: '700', fontSize: '13px', padding: '10px', borderRadius: '7px', textDecoration: 'none'
-              }}>Get Started</Link>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'13px',fontWeight:'600',color:'#FFFFFF',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.profile?.full_name}</div>
+                <div style={{fontSize:'12px',color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.profile?.email}</div>
+              </div>
+              <span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:rc.bg,color:rc.color,flexShrink:0}}>{m.role}</span>
+              <div style={{fontSize:'11px',color:C.muted,flexShrink:0,display:'none'}}>{new Date(m.joined_at).toLocaleDateString('en-US')}</div>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer style={{borderTop: '1px solid #1A3A5C', padding: '24px', textAlign: 'center', color: '#D6DCE5', fontSize: '12px', marginTop: '24px'}}>
-        © 2025 CommunityFlow · Community Management Platform
-      </footer>
+          )
+        })}
+      </div>
     </div>
   )
 }
