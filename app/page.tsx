@@ -2,114 +2,111 @@ import Link from 'next/link'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col" style={{background: '#0A0F2E'}}>
-      {/* Flag bar top */}
-      <div className="h-1 w-full flex">
-        <div className="flex-1" style={{background: '#0038A8'}}></div>
-        <div className="flex-1" style={{background: '#FCD116'}}></div>
-        <div className="flex-1" style={{background: '#CE1126'}}></div>
-      </div>
+    <div style={{background: '#0B1F3A', minHeight: '100vh', fontFamily: "'Inter', 'Poppins', sans-serif", color: '#FFFFFF'}}>
 
       {/* Nav */}
-      <nav className="px-5 py-3 flex items-center justify-between" style={{background: '#0D1535', borderBottom: '1px solid #1E2D5A'}}>
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-base"
-            style={{background: 'linear-gradient(135deg, #CE1126, #0038A8)'}}>
-            B
-          </div>
+      <nav style={{background: '#0B1F3A', borderBottom: '1px solid #1A3A5C', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+          <div style={{width: '36px', height: '36px', background: '#D4A017', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#0B1F3A', fontSize: '16px'}}>C</div>
           <div>
-            <div className="font-bold text-sm" style={{color: '#FCD116'}}>Bayanihan</div>
-            <div className="text-xs" style={{color: '#A0AEC0'}}>Para sa mga Pilipino 🇵🇭</div>
+            <div style={{fontWeight: '700', fontSize: '15px', color: '#FFFFFF', letterSpacing: '-0.3px'}}>CommunityFlow</div>
+            <div style={{fontSize: '10px', color: '#D6DCE5'}}>Simple. Transparent. Connected.</div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/auth/login" className="text-sm font-medium px-3 py-1.5 rounded-lg border"
-            style={{color: '#FCD116', borderColor: '#FCD116'}}>
-            Login
-          </Link>
-          <Link href="/auth/signup" className="text-sm font-medium px-3 py-1.5 rounded-lg text-white font-bold"
-            style={{background: '#CE1126'}}>
-            Libre →
-          </Link>
+        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+          <Link href="/auth/login" style={{fontSize: '13px', color: '#D6DCE5', padding: '7px 16px', borderRadius: '7px', border: '1px solid #2A4A6C', textDecoration: 'none'}}>Login</Link>
+          <Link href="/auth/signup" style={{fontSize: '13px', fontWeight: '600', color: '#0B1F3A', padding: '7px 16px', borderRadius: '7px', background: '#D4A017', textDecoration: 'none'}}>Start Free</Link>
         </div>
       </nav>
 
       {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-12 text-center">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6"
-          style={{background: '#1A2550', color: '#FCD116', border: '1px solid #FCD116'}}>
-          🇵🇭 Para sa mga Pilipino
+      <section style={{textAlign: 'center', padding: '72px 24px 56px'}}>
+        <div style={{display: 'inline-block', background: '#132D4E', color: '#D4A017', fontSize: '11px', fontWeight: '600', padding: '5px 14px', borderRadius: '20px', marginBottom: '24px', letterSpacing: '0.08em', textTransform: 'uppercase'}}>
+          Community Management Platform
         </div>
-
-        <h1 className="text-3xl md:text-5xl font-bold max-w-xl leading-tight mb-4" style={{color: '#FFFFFF'}}>
-          Mula sa notebook,<br />
-          <span style={{color: '#CE1126'}}>dalhin natin</span>{' '}
-          <span style={{color: '#FCD116'}}>ang bayanihan</span><br />
-          <span style={{color: '#5B8BFF'}}>sa digital age.</span>
+        <h1 style={{fontSize: 'clamp(28px, 6vw, 52px)', fontWeight: '700', lineHeight: '1.15', marginBottom: '20px', maxWidth: '640px', margin: '0 auto 20px', letterSpacing: '-1px'}}>
+          Manage your community,<br />
+          <span style={{color: '#D4A017'}}>funds, and records</span><br />
+          in one place.
         </h1>
-
-        <p className="text-sm md:text-base max-w-md mb-8 leading-relaxed" style={{color: '#A0AEC0'}}>
-          I-track ang contributions, funds, at bills ng inyong paluwagan o kooperatiba.
-          Transparent. Simple. <span style={{color: '#FCD116', fontWeight: 'bold'}}>Libre magsimula.</span>
+        <p style={{fontSize: '15px', color: '#D6DCE5', maxWidth: '480px', margin: '0 auto 36px', lineHeight: '1.7'}}>
+          A modern platform for member management, contributions, payments, and financial tracking. Simple. Transparent. Connected.
         </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-none justify-center">
-          <Link href="/auth/signup"
-            className="px-8 py-3 rounded-xl text-white font-bold text-sm"
-            style={{background: 'linear-gradient(135deg, #CE1126, #8B0000)'}}>
-            Magsimula nang libre 🇵🇭
+        <div style={{display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap'}}>
+          <Link href="/auth/signup" style={{background: '#D4A017', color: '#0B1F3A', fontWeight: '700', fontSize: '14px', padding: '13px 28px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block'}}>
+            Start Free
           </Link>
-          <Link href="/auth/login"
-            className="px-8 py-3 rounded-xl font-bold text-sm border-2"
-            style={{color: '#FCD116', borderColor: '#FCD116', background: 'transparent'}}>
-            Mag-login
+          <Link href="/auth/login" style={{background: 'transparent', color: '#FFFFFF', fontWeight: '500', fontSize: '14px', padding: '13px 28px', borderRadius: '8px', textDecoration: 'none', display: 'inline-block', border: '1px solid #2A4A6C'}}>
+            Login
           </Link>
         </div>
+      </section>
 
-        {/* Pricing pills */}
-        <div className="flex flex-wrap gap-2 justify-center mt-10">
+      {/* Features */}
+      <section style={{padding: '48px 24px', maxWidth: '960px', margin: '0 auto'}}>
+        <h2 style={{textAlign: 'center', fontSize: '22px', fontWeight: '700', marginBottom: '8px'}}>Everything your community needs</h2>
+        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Built for cooperatives, paluwagan groups, and community organizations.</p>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px'}}>
           {[
-            { name: 'Free', desc: '10 members · ₱0', bg: '#1A2550', color: '#5B8BFF' },
-            { name: 'Starter', desc: '30 members · ₱200/mo', bg: '#2D1A1A', color: '#FF6B6B' },
-            { name: 'Pro', desc: '80 members · ₱1,299/mo', bg: '#0038A8', color: '#FCD116' },
-            { name: 'Elite', desc: 'Unlimited · ₱2,999/mo', bg: '#CE1126', color: '#FCD116' },
-          ].map(p => (
-            <div key={p.name} className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{background: p.bg, color: p.color, border: `1px solid ${p.color}33`}}>
-              {p.name} — {p.desc}
-            </div>
-          ))}
-        </div>
-
-        {/* Feature grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-10 max-w-lg w-full text-left">
-          {[
-            { icon: '👥', title: 'Member tracker', desc: 'Lahat ng miyembro at kanilang records', bg: '#1A2550', color: '#5B8BFF' },
-            { icon: '💰', title: 'Fund overview', desc: 'Total fund, collected, at pending', bg: '#2D1A1A', color: '#FF6B6B' },
-            { icon: '📋', title: 'Bills tracker', desc: 'Lahat ng scheduled payments', bg: '#2D2500', color: '#FCD116' },
-            { icon: '🏦', title: 'Loan management', desc: 'Request, approve, at i-track', bg: '#1A2550', color: '#5B8BFF' },
-            { icon: '📱', title: 'SMS reminders', desc: 'Auto-remind sa overdue members', bg: '#2D1A1A', color: '#FF6B6B' },
-            { icon: '📊', title: 'PDF reports', desc: 'Monthly report para sa treasurer', bg: '#2D2500', color: '#FCD116' },
+            { title: 'Member Management', desc: 'Track all members, roles, and membership history in one organized dashboard.' },
+            { title: 'Fund Overview', desc: 'Real-time visibility into total funds, collections, and pending payments.' },
+            { title: 'Payment Tracking', desc: 'Record and monitor every contribution with full transaction history.' },
+            { title: 'Loan Management', desc: 'Handle loan requests, approvals, and repayment schedules with ease.' },
+            { title: 'Reports & Analytics', desc: 'Generate monthly PDF reports for transparency and compliance.' },
+            { title: 'Overdue Alerts', desc: 'Automatic notifications for overdue members and pending collections.' },
           ].map(f => (
-            <div key={f.title} className="rounded-xl p-3" style={{background: f.bg, border: `1px solid ${f.color}33`}}>
-              <div className="text-xl mb-1">{f.icon}</div>
-              <div className="font-bold text-xs mb-0.5" style={{color: f.color}}>{f.title}</div>
-              <div className="text-xs" style={{color: '#718096'}}>{f.desc}</div>
+            <div key={f.title} style={{background: '#FFFFFF', borderRadius: '12px', padding: '20px', color: '#0B1F3A'}}>
+              <div style={{width: '32px', height: '3px', background: '#D4A017', borderRadius: '2px', marginBottom: '12px'}}></div>
+              <div style={{fontWeight: '600', fontSize: '14px', marginBottom: '6px'}}>{f.title}</div>
+              <div style={{fontSize: '13px', color: '#4A5568', lineHeight: '1.6'}}>{f.desc}</div>
             </div>
           ))}
         </div>
-      </main>
+      </section>
 
-      {/* Footer flag bar */}
-      <div className="h-1 w-full flex">
-        <div className="flex-1" style={{background: '#CE1126'}}></div>
-        <div className="flex-1" style={{background: '#FCD116'}}></div>
-        <div className="flex-1" style={{background: '#0038A8'}}></div>
-      </div>
-      <footer className="text-center py-4 text-xs" style={{background: '#0D1535', color: '#4A5568'}}>
-        © 2025 Bayanihan · Community Savings Platform para sa mga Pilipino 🇵🇭
+      {/* Plans */}
+      <section style={{padding: '48px 24px', maxWidth: '960px', margin: '0 auto'}}>
+        <h2 style={{textAlign: 'center', fontSize: '22px', fontWeight: '700', marginBottom: '8px'}}>Simple pricing</h2>
+        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Start free. Upgrade as your group grows.</p>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px'}}>
+          {[
+            { name: 'Free', price: '₱0', period: 'forever', members: 'Up to 10 Members', features: ['Member tracker', 'Fund overview', 'Payment history'], highlight: false },
+            { name: 'Starter', price: '₱200', period: '/month', members: 'Up to 30 Members', features: ['Everything in Free', 'Bills tracker', 'Overdue alerts', 'Group announcements'], highlight: false },
+            { name: 'Pro', price: '₱1,299', period: '/month', members: 'Up to 80 Members', features: ['Everything in Starter', 'Loan management', 'Loan calculator', 'SMS reminders', 'PDF reports'], highlight: true },
+            { name: 'Elite', price: '₱2,999', period: '/month', members: 'Unlimited Members', features: ['Everything in Pro', 'AI features', 'White-label', 'Multi-group', 'GCash QR', 'Priority support'], highlight: false },
+          ].map(p => (
+            <div key={p.name} style={{
+              background: p.highlight ? '#D4A017' : '#FFFFFF',
+              borderRadius: '12px', padding: '24px',
+              color: p.highlight ? '#0B1F3A' : '#0B1F3A',
+              border: p.highlight ? 'none' : '1px solid #E2E8F0',
+              position: 'relative'
+            }}>
+              {p.highlight && <div style={{position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: '#0B1F3A', color: '#D4A017', fontSize: '10px', fontWeight: '700', padding: '3px 12px', borderRadius: '20px', whiteSpace: 'nowrap'}}>MOST POPULAR</div>}
+              <div style={{fontWeight: '700', fontSize: '16px', marginBottom: '4px'}}>{p.name}</div>
+              <div style={{fontSize: '24px', fontWeight: '700', marginBottom: '2px'}}>{p.price}<span style={{fontSize: '12px', fontWeight: '400'}}>{p.period}</span></div>
+              <div style={{fontSize: '12px', marginBottom: '16px', opacity: 0.7}}>{p.members}</div>
+              <div style={{borderTop: `1px solid ${p.highlight ? '#0B1F3A22' : '#E2E8F0'}`, paddingTop: '14px'}}>
+                {p.features.map(f => (
+                  <div key={f} style={{fontSize: '12px', padding: '3px 0', display: 'flex', alignItems: 'center', gap: '6px'}}>
+                    <span style={{color: p.highlight ? '#0B1F3A' : '#D4A017', fontWeight: '700'}}>✓</span> {f}
+                  </div>
+                ))}
+              </div>
+              <Link href="/auth/signup" style={{
+                display: 'block', textAlign: 'center', marginTop: '16px',
+                background: p.highlight ? '#0B1F3A' : '#D4A017',
+                color: p.highlight ? '#D4A017' : '#0B1F3A',
+                fontWeight: '700', fontSize: '13px', padding: '10px', borderRadius: '7px', textDecoration: 'none'
+              }}>Get Started</Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{borderTop: '1px solid #1A3A5C', padding: '24px', textAlign: 'center', color: '#D6DCE5', fontSize: '12px', marginTop: '24px'}}>
+        © 2025 CommunityFlow · Community Management Platform
       </footer>
     </div>
   )
