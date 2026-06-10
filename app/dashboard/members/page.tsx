@@ -14,10 +14,15 @@ export default function MembersPage() {
   const [role, setRole] = useState('member')
   const [adding, setAdding] = useState(false)
   const [msg, setMsg] = useState({ type: '', text: '' })
+  const [copied, setCopied] = useState(false)
 
   const planLimit: Record<string, number> = { free: 10, starter: 30, pro: 80, elite: Infinity }
   const limit = planLimit[group?.plan] || 10
   const isAdmin = members.find(m => m.profile_id === user?.id)?.role === 'admin'
+
+  const inviteLink = group?.invite_token
+    ? `${typeof window !== 'undefined' ? window.location.origin : 'https://bayanihan-app-flax.vercel.app'}/join?token=${group.invite_token}`
+    : ''
 
   useEffect(() => { if (!group) return; loadMembers() }, [group])
 
@@ -40,6 +45,12 @@ export default function MembersPage() {
       loadMembers()
     } catch (e: any) { setMsg({ type: 'error', text: e.message }) }
     setAdding(false)
+  }
+
+  function copyInviteLink() {
+    navigator.clipboard.writeText(inviteLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
   }
 
   const roleColor: Record<string, { bg: string, color: string }> = {
@@ -67,6 +78,23 @@ export default function MembersPage() {
         )}
       </div>
 
+      {/* Invite Link */}
+      {isAdmin && inviteLink && (
+        <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'14px'}}>
+          <div style={{fontSize:'13px',fontWeight:'600',color:'#FFFFFF',marginBottom:'8px'}}>Invite Link</div>
+          <p style={{fontSize:'12px',color:C.muted,marginBottom:'10px'}}>Share this link so members can join directly — no need to create a group.</p>
+          <div style={{display:'flex',gap:'8px',alignItems:'center'}}>
+            <div style={{flex:1,background:'#0B1F3A',border:`1px solid ${C.border}`,borderRadius:'8px',padding:'8px 12px',fontSize:'12px',color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+              {inviteLink}
+            </div>
+            <button onClick={copyInviteLink}
+              style={{background:copied?'#0B3A1F':C.gold,color:copied?'#4ADE80':C.bg,fontWeight:'700',fontSize:'13px',padding:'8px 16px',borderRadius:'8px',border:'none',cursor:'pointer',flexShrink:0,transition:'all 0.2s'}}>
+              {copied ? '✓ Copied!' : 'Copy Link'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Plan limit bar */}
       {limit !== Infinity && (
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'10px',padding:'12px 16px',marginBottom:'14px'}}>
@@ -83,7 +111,7 @@ export default function MembersPage() {
       {/* Add member form */}
       {showAdd && isAdmin && (
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'14px'}}>
-          <h3 style={{fontSize:'14px',fontWeight:'600',color:'#FFFFFF',margin:'0 0 12px'}}>Add a member</h3>
+          <h3 style={{fontSize:'14px',fontWeight:'600',color:'#FFFFFF',margin:'0 0 12px'}}>Add by email</h3>
           {msg.text && <div style={{fontSize:'13px',padding:'8px 12px',borderRadius:'8px',marginBottom:'12px',background:msg.type==='error'?'#FF000015':'#D4A01715',color:msg.type==='error'?'#FF6B6B':C.gold}}>{msg.text}</div>}
           <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="member@email.com"
@@ -109,7 +137,7 @@ export default function MembersPage() {
         {members.length === 0 ? (
           <div style={{textAlign:'center',padding:'40px',color:C.muted}}>
             <div style={{fontSize:'32px',marginBottom:'8px'}}>◎</div>
-            <p style={{fontSize:'13px',margin:0}}>No members yet. Add your first member!</p>
+            <p style={{fontSize:'13px',margin:0}}>No members yet. Share the invite link above!</p>
           </div>
         ) : members.map((m, i) => {
           const rc = roleColor[m.role] || roleColor.member
@@ -123,7 +151,6 @@ export default function MembersPage() {
                 <div style={{fontSize:'12px',color:C.muted,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.profile?.email}</div>
               </div>
               <span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:rc.bg,color:rc.color,flexShrink:0}}>{m.role}</span>
-              <div style={{fontSize:'11px',color:C.muted,flexShrink:0,display:'none'}}>{new Date(m.joined_at).toLocaleDateString('en-US')}</div>
             </div>
           )
         })}
