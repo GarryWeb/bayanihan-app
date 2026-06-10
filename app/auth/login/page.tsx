@@ -21,37 +21,46 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5] px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-[#1D9E75] rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-xl font-bold">B</span>
-          </div>
-          <h1 className="text-xl font-semibold">Mag-login sa Bayanihan</h1>
-          <p className="text-sm text-gray-500 mt-1">I-enter ang iyong account details</p>
+    <div style={{minHeight: '100vh', background: '#0B1F3A', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: "'Inter', sans-serif"}}>
+      <div style={{width: '100%', maxWidth: '400px'}}>
+        {/* Logo */}
+        <div style={{textAlign: 'center', marginBottom: '32px'}}>
+          <div style={{width: '48px', height: '48px', background: '#D4A017', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#0B1F3A', fontSize: '20px', margin: '0 auto 12px'}}>C</div>
+          <div style={{fontWeight: '700', fontSize: '20px', color: '#FFFFFF'}}>CommunityFlow</div>
+          <div style={{fontSize: '13px', color: '#D6DCE5', marginTop: '4px'}}>Sign in to your account</div>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-          <form onSubmit={handleLogin} className="space-y-4">
-            {error && <div className="bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-lg">{error}</div>}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="juan@example.com" required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D9E75]" />
+
+        {/* Card */}
+        <div style={{background: '#132D4E', borderRadius: '16px', padding: '28px', border: '1px solid #1A3A5C'}}>
+          <form onSubmit={handleLogin}>
+            {error && (
+              <div style={{background: '#FF000022', border: '1px solid #FF000044', color: '#FF6B6B', fontSize: '13px', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px'}}>
+                {error}
+              </div>
+            )}
+            <div style={{marginBottom: '16px'}}>
+              <label style={{display: 'block', fontSize: '13px', fontWeight: '500', color: '#D6DCE5', marginBottom: '6px'}}>Email address</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required
+                style={{width: '100%', background: '#0B1F3A', border: '1px solid #1A3A5C', borderRadius: '8px', padding: '11px 14px', fontSize: '14px', color: '#FFFFFF', outline: 'none', boxSizing: 'border-box'}} />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div style={{marginBottom: '20px'}}>
+              <label style={{display: 'block', fontSize: '13px', fontWeight: '500', color: '#D6DCE5', marginBottom: '6px'}}>Password</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D9E75]" />
+                style={{width: '100%', background: '#0B1F3A', border: '1px solid #1A3A5C', borderRadius: '8px', padding: '11px 14px', fontSize: '14px', color: '#FFFFFF', outline: 'none', boxSizing: 'border-box'}} />
             </div>
             <button type="submit" disabled={loading}
-              className="w-full bg-[#1D9E75] text-white py-2.5 rounded-lg text-sm font-medium hover:bg-[#085041] transition-colors disabled:opacity-60">
-              {loading ? 'Naglo-login...' : 'Mag-login'}
+              style={{width: '100%', background: '#D4A017', color: '#0B1F3A', fontWeight: '700', fontSize: '14px', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer', opacity: loading ? 0.7 : 1}}>
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         </div>
-        <p className="text-center text-sm text-gray-500 mt-4">
-          Wala pang account?{' '}
-          <Link href="/auth/signup" className="text-[#1D9E75] font-medium hover:underline">Mag-sign up nang libre</Link>
+
+        <p style={{textAlign: 'center', fontSize: '13px', color: '#D6DCE5', marginTop: '20px'}}>
+          Don't have an account?{' '}
+          <Link href="/auth/signup" style={{color: '#D4A017', fontWeight: '600', textDecoration: 'none'}}>Start for free</Link>
+        </p>
+        <p style={{textAlign: 'center', marginTop: '16px'}}>
+          <Link href="/" style={{color: '#D6DCE5', fontSize: '12px', textDecoration: 'none'}}>← Back to CommunityFlow</Link>
         </p>
       </div>
     </div>
