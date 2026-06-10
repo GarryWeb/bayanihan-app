@@ -4,18 +4,14 @@ export default function LandingPage() {
   return (
     <div style={{background: '#0B1F3A', minHeight: '100vh', fontFamily: "'Inter', 'Poppins', sans-serif", color: '#FFFFFF'}}>
 
-      {/* Nav */}
-      <nav style={{background: '#0B1F3A', borderBottom: '1px solid #1A3A5C', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50}}>
+      {/* Nav - logo only, no buttons */}
+      <nav style={{background: '#0B1F3A', borderBottom: '1px solid #1A3A5C', padding: '16px 24px', display: 'flex', alignItems: 'center', position: 'sticky', top: 0, zIndex: 50}}>
         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
           <div style={{width: '36px', height: '36px', background: '#D4A017', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#0B1F3A', fontSize: '16px'}}>C</div>
           <div>
             <div style={{fontWeight: '700', fontSize: '15px', color: '#FFFFFF', letterSpacing: '-0.3px'}}>CommunityFlow</div>
             <div style={{fontSize: '10px', color: '#D6DCE5'}}>Simple. Transparent. Connected.</div>
           </div>
-        </div>
-        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
-          <Link href="/auth/login" style={{fontSize: '13px', color: '#D6DCE5', padding: '7px 16px', borderRadius: '7px', border: '1px solid #2A4A6C', textDecoration: 'none'}}>Login</Link>
-          <Link href="/auth/signup" style={{fontSize: '13px', fontWeight: '600', color: '#0B1F3A', padding: '7px 16px', borderRadius: '7px', background: '#D4A017', textDecoration: 'none'}}>Start Free</Link>
         </div>
       </nav>
 
@@ -45,7 +41,7 @@ export default function LandingPage() {
       {/* Features */}
       <section style={{padding: '48px 24px', maxWidth: '960px', margin: '0 auto'}}>
         <h2 style={{textAlign: 'center', fontSize: '22px', fontWeight: '700', marginBottom: '8px'}}>Everything your community needs</h2>
-        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Built for cooperatives, paluwagan groups, and community organizations.</p>
+        <p style={{textAlign: 'center', color: '#D6DCE5', fontSize: '14px', marginBottom: '36px'}}>Built for Cooperatives and Community Organizations.</p>
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px'}}>
           {[
             { title: 'Member Management', desc: 'Track all members, roles, and membership history in one organized dashboard.' },
@@ -78,7 +74,7 @@ export default function LandingPage() {
             <div key={p.name} style={{
               background: p.highlight ? '#D4A017' : '#FFFFFF',
               borderRadius: '12px', padding: '24px',
-              color: p.highlight ? '#0B1F3A' : '#0B1F3A',
+              color: '#0B1F3A',
               border: p.highlight ? 'none' : '1px solid #E2E8F0',
               position: 'relative'
             }}>
@@ -93,12 +89,9 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/auth/signup" style={{
-                display: 'block', textAlign: 'center', marginTop: '16px',
-                background: p.highlight ? '#0B1F3A' : '#D4A017',
-                color: p.highlight ? '#D4A017' : '#0B1F3A',
-                fontWeight: '700', fontSize: '13px', padding: '10px', borderRadius: '7px', textDecoration: 'none'
-              }}>Get Started</Link>
+              <Link href="/auth/signup" style={{display: 'block', textAlign: 'center', marginTop: '16px', background: p.highlight ? '#0B1F3A' : '#D4A017', color: p.highlight ? '#D4A017' : '#0B1F3A', fontWeight: '700', fontSize: '13px', padding: '10px', borderRadius: '7px', textDecoration: 'none'}}>
+                Get Started
+              </Link>
             </div>
           ))}
         </div>
@@ -106,7 +99,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{borderTop: '1px solid #1A3A5C', padding: '24px', textAlign: 'center', color: '#D6DCE5', fontSize: '12px', marginTop: '24px'}}>
-        © 2025 CommunityFlow · Community Management Platform
+        © 2026 CommunityFlow · Community Management Platform
       </footer>
     </div>
   )
