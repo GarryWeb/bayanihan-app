@@ -5,23 +5,23 @@ import Link from 'next/link'
 import { supabase, getMyGroups, createGroup } from '@/lib/supabase'
 
 const NAV = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/dashboard/members', label: 'Mga Miyembro', icon: '👥' },
-  { href: '/dashboard/contributions', label: 'Contributions', icon: '💵' },
-  { href: '/dashboard/loans', label: 'Loans', icon: '🏦' },
-  { href: '/dashboard/settings', label: 'Settings', icon: '⚙️' },
+  { href: '/dashboard', label: 'Dashboard', icon: '▦' },
+  { href: '/dashboard/members', label: 'Members', icon: '⬡' },
+  { href: '/dashboard/contributions', label: 'Contributions', icon: '◈' },
+  { href: '/dashboard/loans', label: 'Loans', icon: '◎' },
+  { href: '/dashboard/settings', label: 'Settings', icon: '◐' },
 ]
 
 export const ActiveGroupContext = createContext<{ group: any, user: any, reload: () => void }>({ group: null, user: null, reload: () => {} })
 export const useActiveGroup = () => useContext(ActiveGroupContext)
 
-const PH = { navy: '#0038A8', red: '#CE1126', gold: '#FCD116', dark: '#0A0F2E', darker: '#060B1F', card: '#0D1535', border: '#1E2D5A', text: '#A0AEC0' }
+const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', text: '#D6DCE5', muted: '#7A8FA6' }
 
-const planColors: Record<string, { bg: string, color: string }> = {
-  free: { bg: '#1A2550', color: '#5B8BFF' },
-  starter: { bg: '#2D1A1A', color: '#FF6B6B' },
-  pro: { bg: '#0038A8', color: '#FCD116' },
-  elite: { bg: '#CE1126', color: '#FCD116' },
+const planBadge: Record<string, { bg: string, color: string }> = {
+  free: { bg: '#1A3A5C', color: '#D6DCE5' },
+  starter: { bg: '#1A3A5C', color: '#D4A017' },
+  pro: { bg: '#D4A017', color: '#0B1F3A' },
+  elite: { bg: '#0B1F3A', color: '#D4A017' },
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -63,75 +63,52 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setCreating(false)
   }
 
-  async function handleSignOut() {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
+  const initials = (s: string) => s?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?'
 
-  const initials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || '?'
-
-  const Sidebar = () => (
-    <div className="flex flex-col h-full" style={{background: PH.card, borderRight: `1px solid ${PH.border}`}}>
-      {/* Flag bar */}
-      <div className="h-1 w-full flex flex-shrink-0">
-        <div className="flex-1" style={{background: PH.navy}}></div>
-        <div className="flex-1" style={{background: PH.gold}}></div>
-        <div className="flex-1" style={{background: PH.red}}></div>
-      </div>
-
+  const SidebarContent = () => (
+    <div style={{display: 'flex', flexDirection: 'column', height: '100%', background: C.card, borderRight: `1px solid ${C.border}`, fontFamily: "'Inter', sans-serif"}}>
       {/* Brand */}
-      <div className="px-4 py-3 flex-shrink-0" style={{borderBottom: `1px solid ${PH.border}`}}>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0"
-            style={{background: `linear-gradient(135deg, ${PH.red}, ${PH.navy})`}}>B</div>
+      <div style={{padding: '16px', borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+          <div style={{width: '32px', height: '32px', background: C.gold, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: C.bg, fontSize: '14px', flexShrink: 0}}>C</div>
           <div>
-            <div className="font-bold text-sm" style={{color: PH.gold}}>Bayanihan</div>
-            <div className="text-xs" style={{color: PH.text}}>🇵🇭 Platform</div>
+            <div style={{fontWeight: '700', fontSize: '13px', color: '#FFFFFF'}}>CommunityFlow</div>
+            <div style={{fontSize: '10px', color: C.muted}}>Simple. Transparent. Connected.</div>
           </div>
         </div>
       </div>
 
       {/* Groups */}
-      <div className="px-3 py-2 flex-shrink-0" style={{borderBottom: `1px solid ${PH.border}`}}>
-        <div className="text-xs font-bold mb-2 px-1" style={{color: PH.gold, letterSpacing: '0.05em'}}>GRUPO</div>
+      <div style={{padding: '12px', borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
+        <div style={{fontSize: '10px', fontWeight: '600', color: C.muted, letterSpacing: '0.08em', marginBottom: '8px', paddingLeft: '4px'}}>GROUPS</div>
         {groups.map(g => {
-          const pc = planColors[g.plan] || planColors.free
+          const pb = planBadge[g.plan] || planBadge.free
+          const active = activeGroup?.id === g.id
           return (
             <button key={g.id} onClick={() => setActiveGroup(g)}
-              className="w-full text-left px-3 py-2 rounded-lg text-sm transition-all mb-1"
-              style={{
-                background: activeGroup?.id === g.id ? `${PH.navy}44` : 'transparent',
-                border: activeGroup?.id === g.id ? `1px solid ${PH.navy}` : '1px solid transparent',
-                color: activeGroup?.id === g.id ? '#fff' : PH.text
-              }}>
-              <div className="font-medium truncate text-xs">{g.name}</div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <span className="text-xs px-1.5 py-0.5 rounded-full font-bold" style={{background: pc.bg, color: pc.color}}>{g.plan}</span>
-                <span className="text-xs" style={{color: PH.text}}>{g.role}</span>
+              style={{width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: '8px', marginBottom: '4px', cursor: 'pointer', background: active ? '#0B1F3A' : 'transparent', border: active ? `1px solid ${C.gold}44` : '1px solid transparent', color: active ? '#FFFFFF' : C.text, transition: 'all 0.15s'}}>
+              <div style={{fontSize: '12px', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{g.name}</div>
+              <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px'}}>
+                <span style={{fontSize: '10px', padding: '1px 6px', borderRadius: '10px', fontWeight: '600', background: pb.bg, color: pb.color}}>{g.plan}</span>
+                <span style={{fontSize: '10px', color: C.muted}}>{g.role}</span>
               </div>
             </button>
           )
         })}
         <button onClick={() => setShowNewGroup(true)}
-          className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-all"
-          style={{color: PH.gold, border: `1px dashed ${PH.gold}44`}}>
-          + Bagong grupo
+          style={{width: '100%', textAlign: 'left', padding: '8px 10px', borderRadius: '8px', cursor: 'pointer', background: 'transparent', border: `1px dashed ${C.border}`, color: C.gold, fontSize: '12px', fontWeight: '600'}}>
+          + New group
         </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+      <nav style={{flex: 1, padding: '12px', overflowY: 'auto'}}>
         {NAV.map(item => {
           const active = pathname === item.href
           return (
             <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all font-medium"
-              style={{
-                background: active ? `linear-gradient(90deg, ${PH.navy}, ${PH.red}33)` : 'transparent',
-                color: active ? '#fff' : PH.text,
-                borderLeft: active ? `3px solid ${PH.gold}` : '3px solid transparent'
-              }}>
-              <span className="text-base">{item.icon}</span>
+              style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', marginBottom: '2px', fontSize: '13px', fontWeight: active ? '600' : '400', textDecoration: 'none', background: active ? C.gold : 'transparent', color: active ? C.bg : C.text, borderLeft: active ? 'none' : 'none', transition: 'all 0.15s'}}>
+              <span style={{fontSize: '14px'}}>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           )
@@ -139,88 +116,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       {/* User */}
-      <div className="px-3 py-3 flex-shrink-0" style={{borderTop: `1px solid ${PH.border}`}}>
-        <div className="flex items-center gap-2 px-2 py-2 rounded-lg" style={{background: `${PH.navy}22`}}>
-          <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs flex-shrink-0"
-            style={{background: `linear-gradient(135deg, ${PH.navy}, ${PH.red})`, color: '#fff'}}>
+      <div style={{padding: '12px', borderTop: `1px solid ${C.border}`, flexShrink: 0}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '8px', background: '#0B1F3A'}}>
+          <div style={{width: '28px', height: '28px', borderRadius: '50%', background: C.gold, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '700', color: C.bg, flexShrink: 0}}>
             {initials(user?.user_metadata?.full_name || user?.email || '')}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-bold truncate" style={{color: '#fff'}}>{user?.user_metadata?.full_name || 'User'}</div>
-            <div className="text-xs truncate" style={{color: PH.text}}>{user?.email}</div>
+          <div style={{flex: 1, minWidth: 0}}>
+            <div style={{fontSize: '12px', fontWeight: '600', color: '#FFFFFF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{user?.user_metadata?.full_name || 'User'}</div>
+            <div style={{fontSize: '10px', color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{user?.email}</div>
           </div>
-          <button onClick={handleSignOut} className="text-xs font-bold px-2 py-1 rounded" style={{color: PH.red, background: `${PH.red}22`}}>Exit</button>
+          <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
+            style={{fontSize: '11px', color: C.muted, background: 'transparent', border: 'none', cursor: 'pointer', padding: '2px 6px', borderRadius: '4px'}}>
+            Exit
+          </button>
         </div>
-      </div>
-
-      {/* Flag bar bottom */}
-      <div className="h-1 w-full flex flex-shrink-0">
-        <div className="flex-1" style={{background: PH.red}}></div>
-        <div className="flex-1" style={{background: PH.gold}}></div>
-        <div className="flex-1" style={{background: PH.navy}}></div>
       </div>
     </div>
   )
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{background: PH.dark}}>
+    <div style={{display: 'flex', height: '100vh', overflow: 'hidden', background: C.bg, fontFamily: "'Inter', sans-serif"}}>
       {/* Desktop sidebar */}
-      <div className="hidden md:flex w-56 flex-shrink-0 flex-col">
-        <Sidebar />
+      <div style={{width: '220px', flexShrink: 0, display: 'flex', flexDirection: 'column'}}>
+        <SidebarContent />
       </div>
 
       {/* Mobile sidebar */}
       {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="w-64 flex-shrink-0"><Sidebar /></div>
-          <div className="flex-1 bg-black/60" onClick={() => setSidebarOpen(false)} />
+        <div style={{position: 'fixed', inset: 0, zIndex: 50, display: 'flex'}}>
+          <div style={{width: '240px', flexShrink: 0}}><SidebarContent /></div>
+          <div style={{flex: 1, background: 'rgba(0,0,0,0.6)'}} onClick={() => setSidebarOpen(false)} />
         </div>
       )}
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div style={{flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden'}}>
         {/* Mobile topbar */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 flex-shrink-0" style={{background: PH.card, borderBottom: `1px solid ${PH.border}`}}>
-          <button onClick={() => setSidebarOpen(true)}>
-            <svg className="w-5 h-5" fill="none" stroke={PH.gold} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <span className="font-bold text-sm" style={{color: PH.gold}}>Bayanihan</span>
-          {activeGroup && <span className="text-xs truncate" style={{color: PH.text}}>{activeGroup.name}</span>}
+        <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', background: C.card, borderBottom: `1px solid ${C.border}`, flexShrink: 0}}>
+          <button onClick={() => setSidebarOpen(true)} style={{background: 'transparent', border: 'none', cursor: 'pointer', color: C.gold, fontSize: '18px', lineHeight: 1}}>☰</button>
+          <span style={{fontWeight: '700', fontSize: '14px', color: '#FFFFFF'}}>CommunityFlow</span>
+          {activeGroup && <span style={{fontSize: '12px', color: C.muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{activeGroup.name}</span>}
         </div>
 
-        {/* Group banner desktop */}
-        {activeGroup && (
-          <div className="hidden md:flex items-center gap-3 px-6 py-2 flex-shrink-0" style={{background: PH.card, borderBottom: `1px solid ${PH.border}`}}>
-            <span className="text-sm font-bold" style={{color: '#fff'}}>{activeGroup.name}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full font-bold"
-              style={{background: planColors[activeGroup.plan]?.bg || planColors.free.bg, color: planColors[activeGroup.plan]?.color || planColors.free.color}}>
-              {activeGroup.plan}
-            </span>
-            {activeGroup.plan === 'free' && (
-              <span className="text-xs ml-auto" style={{color: PH.text}}>
-                Free plan · 10 members max ·{' '}
-                <Link href="/dashboard/settings" style={{color: PH.gold}}>Mag-upgrade</Link>
-              </span>
-            )}
-          </div>
-        )}
-
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main style={{flex: 1, overflowY: 'auto', padding: '20px'}}>
           {activeGroup
             ? <ActiveGroupContext.Provider value={{ group: activeGroup, user, reload: () => loadGroups(user?.id) }}>
                 {children}
               </ActiveGroupContext.Provider>
             : (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className="text-4xl mb-4">👥</div>
-                <h2 className="text-lg font-bold mb-2" style={{color: '#fff'}}>Walang grupo pa</h2>
-                <p className="text-sm mb-6" style={{color: PH.text}}>Gumawa ng iyong unang grupo para magsimula</p>
+              <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center'}}>
+                <div style={{fontSize: '40px', marginBottom: '16px'}}>◎</div>
+                <h2 style={{fontSize: '18px', fontWeight: '700', color: '#FFFFFF', marginBottom: '8px'}}>No groups yet</h2>
+                <p style={{fontSize: '13px', color: C.muted, marginBottom: '24px'}}>Create your first group to get started</p>
                 <button onClick={() => setShowNewGroup(true)}
-                  className="px-6 py-2.5 rounded-lg text-white font-bold text-sm"
-                  style={{background: `linear-gradient(135deg, ${PH.red}, ${PH.navy})`}}>
-                  Gumawa ng grupo
+                  style={{background: C.gold, color: C.bg, fontWeight: '700', fontSize: '14px', padding: '10px 24px', borderRadius: '8px', border: 'none', cursor: 'pointer'}}>
+                  Create a group
                 </button>
               </div>
             )
@@ -230,30 +180,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* New group modal */}
       {showNewGroup && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="rounded-2xl p-6 w-full max-w-sm" style={{background: PH.card, border: `1px solid ${PH.border}`}}>
-            <div className="h-1 w-full flex rounded-full overflow-hidden mb-4">
-              <div className="flex-1" style={{background: PH.navy}}></div>
-              <div className="flex-1" style={{background: PH.gold}}></div>
-              <div className="flex-1" style={{background: PH.red}}></div>
-            </div>
-            <h2 className="font-bold text-lg mb-1" style={{color: '#fff'}}>Bagong grupo</h2>
-            <p className="text-sm mb-4" style={{color: PH.text}}>Paluwagan, kooperatiba, o samahan</p>
+        <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'}}>
+          <div style={{background: C.card, borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '360px', border: `1px solid ${C.border}`}}>
+            <h2 style={{fontWeight: '700', fontSize: '18px', color: '#FFFFFF', marginBottom: '4px'}}>New group</h2>
+            <p style={{fontSize: '13px', color: C.muted, marginBottom: '16px'}}>Cooperative, paluwagan, or community organization</p>
             <input type="text" value={newGroupName} onChange={e => setNewGroupName(e.target.value)}
-              placeholder="Samahan ng Marikina"
-              className="w-full px-3 py-2.5 text-sm rounded-lg mb-4 outline-none"
-              style={{background: PH.dark, border: `1px solid ${PH.border}`, color: '#fff'}}
-              onKeyDown={e => e.key === 'Enter' && handleCreateGroup()} autoFocus />
-            <div className="flex gap-2">
+              placeholder="e.g. Samahan ng Marikina"
+              onKeyDown={e => e.key === 'Enter' && handleCreateGroup()}
+              autoFocus
+              style={{width: '100%', background: C.bg, border: `1px solid ${C.border}`, borderRadius: '8px', padding: '11px 14px', fontSize: '14px', color: '#FFFFFF', outline: 'none', boxSizing: 'border-box', marginBottom: '16px'}} />
+            <div style={{display: 'flex', gap: '10px'}}>
               <button onClick={() => setShowNewGroup(false)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-bold"
-                style={{border: `1px solid ${PH.border}`, color: PH.text, background: 'transparent'}}>
-                Kanselahin
+                style={{flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${C.border}`, background: 'transparent', color: C.text, fontSize: '13px', cursor: 'pointer'}}>
+                Cancel
               </button>
               <button onClick={handleCreateGroup} disabled={creating || !newGroupName.trim()}
-                className="flex-1 py-2.5 rounded-lg text-sm font-bold text-white"
-                style={{background: `linear-gradient(135deg, ${PH.red}, ${PH.navy})`}}>
-                {creating ? 'Ginagawa...' : 'Gumawa'}
+                style={{flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: C.gold, color: C.bg, fontWeight: '700', fontSize: '13px', cursor: 'pointer', opacity: creating || !newGroupName.trim() ? 0.6 : 1}}>
+                {creating ? 'Creating...' : 'Create'}
               </button>
             </div>
           </div>
