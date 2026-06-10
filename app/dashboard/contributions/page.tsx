@@ -5,6 +5,8 @@ import { useActiveGroup } from '../layout'
 
 const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', text: '#D6DCE5', muted: '#7A8FA6' }
 
+const PAYMENT_METHODS = ['Cash', 'GCash', 'Bank Transfer', 'Maya', 'Other']
+
 export default function ContributionsPage() {
   const { group, user } = useActiveGroup()
   const [contributions, setContributions] = useState<any[]>([])
@@ -12,7 +14,7 @@ export default function ContributionsPage() {
   const [loading, setLoading] = useState(true)
   const [cycle, setCycle] = useState(new Date().toISOString().slice(0, 7))
   const [showRecord, setShowRecord] = useState(false)
-  const [form, setForm] = useState({ member_id: '', amount_paid: '', late_fee: '0', status: 'paid', notes: '' })
+  const [form, setForm] = useState({ member_id: '', amount_paid: '', late_fee: '0', status: 'paid', payment_method: 'Cash', notes: '' })
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState({ type: '', text: '' })
 
@@ -34,10 +36,11 @@ export default function ContributionsPage() {
         amount_due: group.contribution_amount || 500,
         amount_paid: Number(form.amount_paid) || group.contribution_amount || 500,
         late_fee: Number(form.late_fee) || 0,
-        due_date: dueDate, status: form.status, recorded_by: user?.id, notes: form.notes,
+        due_date: dueDate, status: form.status, recorded_by: user?.id,
+        notes: form.payment_method + (form.notes ? ` · ${form.notes}` : ''),
       })
       setMsg({ type: 'success', text: 'Payment recorded!' })
-      setForm({ member_id: '', amount_paid: '', late_fee: '0', status: 'paid', notes: '' })
+      setForm({ member_id: '', amount_paid: '', late_fee: '0', status: 'paid', payment_method: 'Cash', notes: '' })
       loadData()
     } catch (e: any) { setMsg({ type: 'error', text: e.message }) }
     setSaving(false)
@@ -49,6 +52,14 @@ export default function ContributionsPage() {
     overdue: { bg: '#3A0B0B', color: '#F87171' },
   }
   const statusLabel: Record<string, string> = { paid: '✓ Paid', pending: '⏳ Pending', overdue: '⚠ Overdue' }
+
+  const methodColors: Record<string, { bg: string, color: string }> = {
+    'Cash': { bg: '#1A3A5C', color: '#93C5FD' },
+    'GCash': { bg: '#1A2550', color: '#818CF8' },
+    'Bank Transfer': { bg: '#1A3A2A', color: '#6EE7B7' },
+    'Maya': { bg: '#2A1A3A', color: '#C4B5FD' },
+    'Other': { bg: '#2A2A1A', color: '#FCD34D' },
+  }
 
   const paid = contributions.filter(c => c.status === 'paid')
   const totalCollected = paid.reduce((s, c) => s + Number(c.amount_paid), 0)
@@ -83,6 +94,24 @@ export default function ContributionsPage() {
         <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',padding:'16px',marginBottom:'16px'}}>
           <h3 style={{fontSize:'14px',fontWeight:'600',color:'#FFFFFF',margin:'0 0 12px'}}>Record a payment</h3>
           {msg.text && <div style={{fontSize:'13px',padding:'8px 12px',borderRadius:'8px',marginBottom:'12px',background:msg.type==='error'?'#FF000015':'#D4A01715',color:msg.type==='error'?'#FF6B6B':C.gold}}>{msg.text}</div>}
+          
+          {/* Payment method buttons */}
+          <div style={{marginBottom:'14px'}}>
+            <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'8px'}}>Payment Method</label>
+            <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+              {PAYMENT_METHODS.map(m => (
+                <button key={m} onClick={() => setForm(f => ({...f, payment_method: m}))}
+                  style={{padding:'7px 14px',borderRadius:'20px',fontSize:'12px',fontWeight:'600',cursor:'pointer',border:'none',
+                    background: form.payment_method === m ? C.gold : '#0B1F3A',
+                    color: form.payment_method === m ? C.bg : C.muted,
+                    border: `1px solid ${form.payment_method === m ? C.gold : C.border}`,
+                    transition:'all 0.15s'}}>
+                  {m === 'GCash' ? '💜 GCash' : m === 'Cash' ? '💵 Cash' : m === 'Bank Transfer' ? '🏦 Bank Transfer' : m === 'Maya' ? '💙 Maya' : '📝 Other'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:'10px',marginBottom:'12px'}}>
             <div style={{gridColumn:'1/-1'}}>
               <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'4px'}}>Member</label>
@@ -114,7 +143,7 @@ export default function ContributionsPage() {
             <div>
               <label style={{display:'block',fontSize:'12px',color:C.muted,marginBottom:'4px'}}>Notes (optional)</label>
               <input type="text" value={form.notes} onChange={e => setForm(f => ({...f,notes:e.target.value}))}
-                placeholder="GCash, cash, etc." style={{...inputStyle,width:'100%',boxSizing:'border-box' as const}}/>
+                placeholder="Reference number, etc." style={{...inputStyle,width:'100%',boxSizing:'border-box' as const}}/>
             </div>
           </div>
           <button onClick={handleRecord} disabled={saving||!form.member_id}
@@ -126,8 +155,8 @@ export default function ContributionsPage() {
 
       {/* Table */}
       <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:'12px',overflow:'hidden'}}>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto auto auto',gap:'8px',padding:'10px 16px',background:'#0B1F3A',borderBottom:`1px solid ${C.border}`,fontSize:'11px',fontWeight:'600',color:C.muted,textTransform:'uppercase' as const}}>
-          <span>Member</span><span>Amount</span><span>Date</span><span>Status</span>
+        <div style={{display:'grid',gridTemplateColumns:'1fr auto auto auto auto',gap:'8px',padding:'10px 16px',background:'#0B1F3A',borderBottom:`1px solid ${C.border}`,fontSize:'11px',fontWeight:'600',color:C.muted,textTransform:'uppercase' as const}}>
+          <span>Member</span><span>Method</span><span>Amount</span><span>Date</span><span>Status</span>
         </div>
         {contributions.length === 0 ? (
           <div style={{textAlign:'center',padding:'40px',color:C.muted}}>
@@ -135,12 +164,15 @@ export default function ContributionsPage() {
           </div>
         ) : contributions.map((c, i) => {
           const sc = statusColors[c.status] || statusColors.pending
+          const method = c.notes?.split(' · ')[0] || 'Cash'
+          const mc = methodColors[method] || methodColors['Other']
           return (
-            <div key={c.id} style={{display:'grid',gridTemplateColumns:'1fr auto auto auto',gap:'8px',padding:'10px 16px',borderBottom:i<contributions.length-1?`1px solid ${C.border}`:'none',alignItems:'center'}}>
+            <div key={c.id} style={{display:'grid',gridTemplateColumns:'1fr auto auto auto auto',gap:'8px',padding:'10px 16px',borderBottom:i<contributions.length-1?`1px solid ${C.border}`:'none',alignItems:'center'}}>
               <div>
                 <div style={{fontSize:'13px',fontWeight:'600',color:'#FFFFFF'}}>{c.profile?.full_name}</div>
                 {c.late_fee > 0 && <div style={{fontSize:'11px',color:'#F87171'}}>+₱{c.late_fee} late fee</div>}
               </div>
+              <div><span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:mc.bg,color:mc.color}}>{method}</span></div>
               <div style={{fontSize:'13px',color:'#FFFFFF'}}>₱{Number(c.amount_paid).toLocaleString()}</div>
               <div style={{fontSize:'12px',color:C.muted}}>{c.paid_at?new Date(c.paid_at).toLocaleDateString('en-US'):'—'}</div>
               <div><span style={{fontSize:'11px',padding:'3px 8px',borderRadius:'20px',fontWeight:'600',background:sc.bg,color:sc.color}}>{statusLabel[c.status]}</span></div>
