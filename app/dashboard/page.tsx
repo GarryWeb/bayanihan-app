@@ -1,116 +1,106 @@
-import Link from 'next/link'
+'use client'
+import { useEffect, useState } from 'react'
+import { getDashboardStats, getAnnouncements } from '@/lib/supabase'
+import { useActiveGroup } from './layout'
 
-export default function LandingPage() {
+const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', text: '#D6DCE5', muted: '#7A8FA6' }
+
+function fmt(n: number) {
+  return '₱' + (n || 0).toLocaleString('en-PH', { minimumFractionDigits: 0 })
+}
+
+export default function DashboardPage() {
+  const { group } = useActiveGroup()
+  const [stats, setStats] = useState<any>(null)
+  const [announcements, setAnnouncements] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!group) return
+    setLoading(true)
+    Promise.all([getDashboardStats(group.id), getAnnouncements(group.id)])
+      .then(([s, a]) => { setStats(s); setAnnouncements(a); setLoading(false) })
+  }, [group])
+
+  if (!group) return null
+  if (loading) return (
+    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px'}}>
+      <div style={{width: '32px', height: '32px', border: `3px solid ${C.gold}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite'}} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
+
+  const collected = stats?.collected_this_cycle || 0
+  const target = (stats?.total_members || 0) * (group.contribution_amount || 500)
+  const pct = target > 0 ? Math.min(100, Math.round((collected / target) * 100)) : 0
+  const cycleLabel = stats?.current_cycle ? new Date(stats.current_cycle + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''
+
+  const cards = [
+    { label: 'Total Members', value: stats?.total_members || 0, gold: false },
+    { label: 'Community Fund', value: fmt(stats?.total_fund || 0), gold: true },
+    { label: 'Collected This Month', value: fmt(collected), gold: false },
+    { label: 'Pending', value: fmt(stats?.pending_this_cycle || 0), gold: false },
+    { label: 'Overdue', value: stats?.overdue_count || 0, gold: stats?.overdue_count > 0, red: stats?.overdue_count > 0 },
+    { label: 'Active Loans', value: fmt(stats?.total_loans_out || 0), gold: false },
+  ]
+
   return (
-    <div className="min-h-screen flex flex-col" style={{background: '#0A0F2E'}}>
-      {/* Flag bar top */}
-      <div className="h-1 w-full flex">
-        <div className="flex-1" style={{background: '#0038A8'}}></div>
-        <div className="flex-1" style={{background: '#FCD116'}}></div>
-        <div className="flex-1" style={{background: '#CE1126'}}></div>
+    <div style={{fontFamily: "'Inter', sans-serif", color: '#FFFFFF'}}>
+      {/* Header */}
+      <div style={{marginBottom: '20px'}}>
+        <h1 style={{fontSize: '20px', fontWeight: '700', color: '#FFFFFF', margin: 0}}>{group.name}</h1>
+        <p style={{fontSize: '13px', color: C.muted, margin: '4px 0 0'}}>{cycleLabel} · Overview</p>
       </div>
 
-      {/* Nav */}
-      <nav className="px-5 py-3 flex items-center justify-between" style={{background: '#0D1535', borderBottom: '1px solid #1E2D5A'}}>
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-base"
-            style={{background: 'linear-gradient(135deg, #CE1126, #0038A8)'}}>
-            B
-          </div>
+      {/* Overdue alert */}
+      {stats?.overdue_count > 0 && (
+        <div style={{background: '#FF000015', border: '1px solid #FF000033', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'center'}}>
+          <span style={{fontSize: '16px'}}>⚠️</span>
           <div>
-            <div className="font-bold text-sm" style={{color: '#FCD116'}}>Bayanihan</div>
-            <div className="text-xs" style={{color: '#A0AEC0'}}>Para sa mga Pilipino 🇵🇭</div>
+            <div style={{fontSize: '13px', fontWeight: '600', color: '#FF6B6B'}}>{stats.overdue_count} member{stats.overdue_count > 1 ? 's' : ''} overdue this cycle</div>
+            <div style={{fontSize: '12px', color: C.muted, marginTop: '2px'}}>Go to Contributions to view details</div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/auth/login" className="text-sm font-medium px-3 py-1.5 rounded-lg border"
-            style={{color: '#FCD116', borderColor: '#FCD116'}}>
-            Login
-          </Link>
-          <Link href="/auth/signup" className="text-sm font-medium px-3 py-1.5 rounded-lg text-white font-bold"
-            style={{background: '#CE1126'}}>
-            Libre →
-          </Link>
-        </div>
-      </nav>
+      )}
 
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-5 py-12 text-center">
-
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6"
-          style={{background: '#1A2550', color: '#FCD116', border: '1px solid #FCD116'}}>
-          🇵🇭 Para sa mga Pilipino
-        </div>
-
-        <h1 className="text-3xl md:text-5xl font-bold max-w-xl leading-tight mb-4" style={{color: '#FFFFFF'}}>
-          Mula sa notebook,<br />
-          <span style={{color: '#CE1126'}}>dalhin natin</span>{' '}
-          <span style={{color: '#FCD116'}}>ang bayanihan</span><br />
-          <span style={{color: '#5B8BFF'}}>sa digital age.</span>
-        </h1>
-
-        <p className="text-sm md:text-base max-w-md mb-8 leading-relaxed" style={{color: '#A0AEC0'}}>
-          I-track ang contributions, funds, at bills ng inyong paluwagan o kooperatiba.
-          Transparent. Simple. <span style={{color: '#FCD116', fontWeight: 'bold'}}>Libre magsimula.</span>
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-none justify-center">
-          <Link href="/auth/signup"
-            className="px-8 py-3 rounded-xl text-white font-bold text-sm"
-            style={{background: 'linear-gradient(135deg, #CE1126, #8B0000)'}}>
-            Magsimula nang libre 🇵🇭
-          </Link>
-          <Link href="/auth/login"
-            className="px-8 py-3 rounded-xl font-bold text-sm border-2"
-            style={{color: '#FCD116', borderColor: '#FCD116', background: 'transparent'}}>
-            Mag-login
-          </Link>
-        </div>
-
-        {/* Pricing pills */}
-        <div className="flex flex-wrap gap-2 justify-center mt-10">
-          {[
-            { name: 'Free', desc: '10 members · ₱0', bg: '#1A2550', color: '#5B8BFF' },
-            { name: 'Starter', desc: '30 members · ₱200/mo', bg: '#2D1A1A', color: '#FF6B6B' },
-            { name: 'Pro', desc: '80 members · ₱1,299/mo', bg: '#0038A8', color: '#FCD116' },
-            { name: 'Elite', desc: 'Unlimited · ₱2,999/mo', bg: '#CE1126', color: '#FCD116' },
-          ].map(p => (
-            <div key={p.name} className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{background: p.bg, color: p.color, border: `1px solid ${p.color}33`}}>
-              {p.name} — {p.desc}
-            </div>
-          ))}
-        </div>
-
-        {/* Feature grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-10 max-w-lg w-full text-left">
-          {[
-            { icon: '👥', title: 'Member tracker', desc: 'Lahat ng miyembro at kanilang records', bg: '#1A2550', color: '#5B8BFF' },
-            { icon: '💰', title: 'Fund overview', desc: 'Total fund, collected, at pending', bg: '#2D1A1A', color: '#FF6B6B' },
-            { icon: '📋', title: 'Bills tracker', desc: 'Lahat ng scheduled payments', bg: '#2D2500', color: '#FCD116' },
-            { icon: '🏦', title: 'Loan management', desc: 'Request, approve, at i-track', bg: '#1A2550', color: '#5B8BFF' },
-            { icon: '📱', title: 'SMS reminders', desc: 'Auto-remind sa overdue members', bg: '#2D1A1A', color: '#FF6B6B' },
-            { icon: '📊', title: 'PDF reports', desc: 'Monthly report para sa treasurer', bg: '#2D2500', color: '#FCD116' },
-          ].map(f => (
-            <div key={f.title} className="rounded-xl p-3" style={{background: f.bg, border: `1px solid ${f.color}33`}}>
-              <div className="text-xl mb-1">{f.icon}</div>
-              <div className="font-bold text-xs mb-0.5" style={{color: f.color}}>{f.title}</div>
-              <div className="text-xs" style={{color: '#718096'}}>{f.desc}</div>
-            </div>
-          ))}
-        </div>
-      </main>
-
-      {/* Footer flag bar */}
-      <div className="h-1 w-full flex">
-        <div className="flex-1" style={{background: '#CE1126'}}></div>
-        <div className="flex-1" style={{background: '#FCD116'}}></div>
-        <div className="flex-1" style={{background: '#0038A8'}}></div>
+      {/* Stats grid */}
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '14px'}}>
+        {cards.map(c => (
+          <div key={c.label} style={{background: C.card, border: `1px solid ${(c as any).red ? '#FF000033' : C.border}`, borderRadius: '12px', padding: '16px'}}>
+            <div style={{fontSize: '18px', fontWeight: '700', color: (c as any).red ? '#FF6B6B' : c.gold ? C.gold : '#FFFFFF'}}>{String(c.value)}</div>
+            <div style={{fontSize: '12px', color: C.muted, marginTop: '4px'}}>{c.label}</div>
+          </div>
+        ))}
       </div>
-      <footer className="text-center py-4 text-xs" style={{background: '#0D1535', color: '#4A5568'}}>
-        © 2025 Bayanihan · Community Savings Platform para sa mga Pilipino 🇵🇭
-      </footer>
+
+      {/* Progress */}
+      <div style={{background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '16px', marginBottom: '14px'}}>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+          <span style={{fontSize: '13px', fontWeight: '600', color: '#FFFFFF'}}>Monthly Collection Progress</span>
+          <span style={{fontSize: '13px', fontWeight: '700', color: C.gold}}>{pct}%</span>
+        </div>
+        <div style={{height: '6px', background: '#0B1F3A', borderRadius: '3px', overflow: 'hidden'}}>
+          <div style={{height: '100%', width: `${pct}%`, background: C.gold, borderRadius: '3px', transition: 'width 0.5s'}} />
+        </div>
+        <div style={{display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: C.muted, marginTop: '6px'}}>
+          <span>{fmt(collected)} collected</span>
+          <span>{fmt(target)} target</span>
+        </div>
+      </div>
+
+      {/* Announcements */}
+      <div style={{background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '16px'}}>
+        <h2 style={{fontSize: '14px', fontWeight: '600', color: C.gold, margin: '0 0 12px'}}>Announcements</h2>
+        {announcements.length === 0 ? (
+          <p style={{fontSize: '13px', color: C.muted, textAlign: 'center', padding: '16px 0', margin: 0}}>No announcements yet</p>
+        ) : announcements.slice(0, 3).map(a => (
+          <div key={a.id} style={{borderLeft: `3px solid ${a.is_pinned ? C.gold : C.border}`, paddingLeft: '12px', marginBottom: '12px', background: a.is_pinned ? '#D4A01710' : 'transparent', borderRadius: '0 8px 8px 0', padding: '8px 12px'}}>
+            <div style={{fontSize: '13px', fontWeight: '600', color: '#FFFFFF'}}>{a.title}</div>
+            <div style={{fontSize: '12px', color: C.muted, marginTop: '2px'}}>{a.body}</div>
+            <div style={{fontSize: '11px', color: C.muted, marginTop: '4px'}}>{a.profile?.full_name} · {new Date(a.posted_at).toLocaleDateString('en-US')}</div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
