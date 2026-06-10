@@ -26,7 +26,7 @@ export default function LandingPage() {
         </div>
         <h1 style={{fontSize: 'clamp(28px, 6vw, 52px)', fontWeight: '700', lineHeight: '1.15', marginBottom: '20px', maxWidth: '640px', margin: '0 auto 20px', letterSpacing: '-1px'}}>
           Manage your community,<br />
-          <span style={{color: '#D4A017'}}>funds, and records</span><br />
+          <span style={{color: '#D4A017'}}>Funds, and Records</span><br />
           in one place.
         </h1>
         <p style={{fontSize: '15px', color: '#D6DCE5', maxWidth: '480px', margin: '0 auto 36px', lineHeight: '1.7'}}>
