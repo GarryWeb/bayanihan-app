@@ -25,7 +25,7 @@ function JoinContent() {
   }, [token])
 
   async function handleJoin() {
-    if (!user) { router.push(`/auth/signup?redirect=/join?token=${token}`); return }
+    if (!user) { router.push(`/auth/signup?redirect=${encodeURIComponent('/join?token='+token)}`); return }
     setStatus('joining')
     const { data: existing } = await supabase.from('memberships').select('id').eq('group_id', group.id).eq('profile_id', user.id).single()
     if (existing) { setStatus('joined'); setMsg('You are already a member of this group!'); return }
@@ -60,10 +60,10 @@ function JoinContent() {
                 <>
                   <p style={{fontSize:'13px',color:C.muted,marginBottom:'16px'}}>Sign up or log in to join this group.</p>
                   <div style={{display:'flex',gap:'10px'}}>
-                    <button onClick={() => router.push(`/auth/signup?redirect=/join?token=${token}`)} style={{flex:1,background:C.gold,color:C.bg,fontWeight:'700',fontSize:'13px',padding:'10px',borderRadius:'8px',border:'none',cursor:'pointer'}}>
+                    <button onClick={() => router.push(`/auth/signup?redirect=${encodeURIComponent('/join?token='+token)}`)} style={{flex:1,background:C.gold,color:C.bg,fontWeight:'700',fontSize:'13px',padding:'10px',borderRadius:'8px',border:'none',cursor:'pointer'}}>
                       Sign Up & Join
                     </button>
-                    <button onClick={() => router.push(`/auth/login?redirect=/join?token=${token}`)} style={{flex:1,background:'transparent',color:C.gold,fontWeight:'700',fontSize:'13px',padding:'10px',borderRadius:'8px',border:`1px solid ${C.gold}`,cursor:'pointer'}}>
+                    <button onClick={() => router.push(`/auth/login?redirect=${encodeURIComponent('/join?token='+token)}`)} style={{flex:1,background:'transparent',color:C.gold,fontWeight:'700',fontSize:'13px',padding:'10px',borderRadius:'8px',border:`1px solid ${C.gold}`,cursor:'pointer'}}>
                       Login & Join
                     </button>
                   </div>
