@@ -46,7 +46,7 @@ export async function addMemberByEmail(groupId: string, email: string, role = 'm
 
 export async function getContributions(groupId: string, cycle?: string) {
   let q = supabase.from('contributions')
-    .select('*, profile:profiles(full_name, email)')
+    .select('*, profile:profiles!contributions_member_id_fkey(full_name, email)')
     .eq('group_id', groupId).order('created_at', { ascending: false })
   if (cycle) q = q.eq('cycle', cycle)
   const { data } = await q
