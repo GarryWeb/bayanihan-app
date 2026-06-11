@@ -10,7 +10,7 @@ const C = { bg: '#0B1F3A', card: '#132D4E', border: '#1A3A5C', gold: '#D4A017', 
 function SignupContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect')
+  const redirect = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')!) : null
   const [form, setForm] = useState({ full_name: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
