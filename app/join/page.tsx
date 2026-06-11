@@ -76,7 +76,10 @@ function JoinContent() {
             <>
               <div style={{fontSize:'32px',marginBottom:'12px'}}>🎉</div>
               <h2 style={{fontSize:'18px',fontWeight:'700',color:C.gold,marginBottom:'8px'}}>Welcome to {group?.name}!</h2>
-              <p style={{fontSize:'13px',color:C.muted}}>{msg || 'Redirecting to dashboard...'}</p>
+              <p style={{fontSize:'13px',color:C.muted,marginBottom:'16px'}}>{msg || 'You have successfully joined!'}</p>
+              <button onClick={() => router.push('/dashboard')} style={{width:'100%',background:C.gold,color:C.bg,fontWeight:'700',fontSize:'14px',padding:'12px',borderRadius:'8px',border:'none',cursor:'pointer'}}>
+                Go to Dashboard →
+              </button>
             </>
           )}
           {status === 'error' && (
